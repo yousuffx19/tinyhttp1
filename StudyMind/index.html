@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyMind AI — Ultimate Study Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080b10;
+  --s1: #0e1219;
+  --s2: #141924;
+  --s3: #1c2333;
+  --border: #1e2738;
+  --border2: #2a3448;
+  --cyan: #00e5ff;
+  --green: #39ff14;
+  --pink: #ff2d78;
+  --yellow: #ffd600;
+  --purple: #b44dff;
+  --orange: #ff6b35;
+  --text: #e8edf5;
+  --muted: #4a5568;
+  --muted2: #6b7a99;
+  --r: 12px;
+  --font: 'Outfit', sans-serif;
+  --mono: 'Space Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
+.logo-wrap{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-box{width:34px;height:34px;background:var(--cyan);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.logo-name{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:0.05em;}
+.logo-sub{font-size:10px;color:var(--muted2);margin-top:2px;letter-spacing:0.1em;text-transform:uppercase;}
+
+.nav-section{padding:12px 10px 4px;}
+.nav-section-label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:4px;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border:none;background:transparent;color:var(--muted2);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;width:100%;text-align:left;transition:all 0.15s;position:relative;}
+.nav-btn:hover{background:var(--s2);color:var(--text);}
+.nav-btn.active{background:var(--s2);color:var(--text);}
+.nav-btn.active .nav-dot{opacity:1;}
+.nav-dot{width:3px;height:24px;border-radius:2px;position:absolute;left:0;opacity:0;transition:opacity 0.2s;}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--pink);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+
+.sidebar-bottom{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border);}
+.xp-bar-wrap{margin-bottom:10px;}
+.xp-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted2);margin-bottom:5px;}
+.xp-bar{height:4px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:4px;transition:width 0.5s ease;}
+.level-badge{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border-radius:8px;border:1px solid var(--border);}
+.level-icon{font-size:18px;}
+.level-text{font-size:11px;color:var(--muted2);}
+.level-name{font-weight:700;color:var(--yellow);font-size:13px;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s1);flex-shrink:0;}
+.topbar-left{display:flex;flex-direction:column;}
+.page-title{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);}
+.page-sub{font-size:12px;color:var(--muted2);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.streak-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--orange);}
+.theme-toggle{padding:7px 14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;cursor:pointer;transition:all 0.2s;}
+.theme-toggle:hover{border-color:var(--cyan);color:var(--cyan);}
+
+.content{flex:1;overflow-y:auto;padding:24px 28px;background:var(--bg);}
+.tab{display:none;flex-direction:column;gap:18px;animation:fadeUp 0.25s ease;}
+.tab.active{display:flex;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* LIGHT THEME */
+body.light{--bg:#f0f4ff;--s1:#fff;--s2:#f5f7ff;--s3:#eaedfa;--border:#dde3f5;--border2:#c8d0ed;--text:#1a2040;--muted:#9aa3be;--muted2:#6b7a99;}
+body.light .sidebar{box-shadow:2px 0 8px rgba(0,0,0,0.06);}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.card-sm{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+
+/* INPUTS */
+input,textarea,select{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;width:100%;outline:none;transition:border-color 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);}
+textarea{resize:vertical;}
+select{cursor:pointer;}
+label{font-size:12px;color:var(--muted2);display:block;margin-bottom:5px;}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border:none;border-radius:var(--r);font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.18s;display:inline-flex;align-items:center;gap:7px;letter-spacing:0.02em;}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1);}
+.btn:active{transform:translateY(0);}
+.btn-cyan{background:var(--cyan);color:#000;}
+.btn-green{background:var(--green);color:#000;}
+.btn-pink{background:var(--pink);color:#fff;}
+.btn-yellow{background:var(--yellow);color:#000;}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-sm{padding:7px 14px;font-size:11px;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.span2{grid-column:1/-1;}
+
+/* STAT CARDS */
+.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px;}
+.stat-val{font-family:var(--mono);font-size:26px;font-weight:700;}
+.stat-lbl{font-size:11px;color:var(--muted2);}
+.stat-icon{font-size:22px;margin-bottom:4px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+/* ===================== CHAT ===================== */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 180px);min-height:400px;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;}
+.msg{display:flex;gap:10px;animation:fadeUp 0.2s ease;}
+.msg.user{flex-direction:row-reverse;}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ai-av{background:linear-gradient(135deg,var(--cyan),var(--purple));}
+.user-av{background:linear-gradient(135deg,var(--pink),var(--orange));}
+.bubble{max-width:75%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.65;}
+.msg.ai .bubble{background:var(--s2);border-bottom-left-radius:3px;}
+.msg.user .bubble{background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);color:var(--cyan);border-bottom-right-radius:3px;}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.7;margin-top:8px;overflow-x:auto;white-space:pre;}
+.chat-input-row{display:flex;gap:10px;background:var(--s1);border:1px solid var(--border);border-top:none;padding:12px;border-radius:0 0 var(--r) var(--r);}
+.chat-input-row textarea{height:40px;min-height:40px;padding:9px 12px;border-radius:8px;resize:none;}
+.typing span{display:inline-block;width:5px;height:5px;background:var(--muted2);border-radius:50%;animation:blink 1.2s infinite;margin:0 2px;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.quick-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{padding:6px 14px;border:1px solid var(--border2);border-radius:20px;font-size:11px;cursor:pointer;color:var(--muted2);transition:all 0.15s;background:var(--s2);}
+.chip:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* ===================== QUIZ ===================== */
+.quiz-option{padding:11px 16px;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:12px;transition:all 0.15s;background:var(--s2);}
+.quiz-option:hover{border-color:var(--purple);}
+.quiz-option.correct{border-color:var(--green)!important;background:rgba(57,255,20,0.08);color:var(--green);}
+.quiz-option.wrong{border-color:var(--pink)!important;background:rgba(255,45,120,0.08);color:var(--pink);}
+.quiz-option.selected{border-color:var(--purple);}
+.opt-key{width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;}
+.progress-bar{height:5px;background:var(--s3);border-radius:5px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:5px;transition:width 0.4s ease;}
+
+/* ===================== POMODORO ===================== */
+.pomo-circle{width:180px;height:180px;border-radius:50%;border:4px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;position:relative;transition:border-color 0.3s;}
+.pomo-circle.work{border-color:var(--cyan);box-shadow:0 0 30px rgba(0,229,255,0.2);}
+.pomo-circle.break{border-color:var(--green);box-shadow:0 0 30px rgba(57,255,20,0.2);}
+.pomo-time{font-family:var(--mono);font-size:40px;font-weight:700;}
+.pomo-label{font-size:11px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
+.pomo-sessions{display:flex;gap:6px;justify-content:center;margin-top:12px;}
+.pomo-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);}
+.pomo-dot.done{background:var(--cyan);}
+
+/* ===================== FLASHCARDS ===================== */
+.flashcard{width:100%;height:220px;perspective:1000px;cursor:pointer;}
+.flashcard-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.6s;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-front,.flashcard-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--r);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+.flashcard-front{background:var(--s1);}
+.flashcard-back{background:var(--s2);transform:rotateY(180deg);}
+.fc-q{font-size:15px;font-weight:600;line-height:1.5;}
+.fc-a{font-size:13px;line-height:1.7;color:var(--cyan);}
+.fc-hint{font-size:10px;color:var(--muted);margin-top:12px;text-transform:uppercase;letter-spacing:0.1em;}
+.fc-subj{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+
+/* ===================== HABIT TRACKER ===================== */
+.habit-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--s1);border:1px solid var(--border);border-radius:10px;}
+.habit-name{font-size:13px;font-weight:600;flex:1;}
+.habit-days{display:flex;gap:5px;}
+.habit-day{width:28px;height:28px;border-radius:6px;background:var(--s3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);font-weight:700;transition:all 0.15s;}
+.habit-day.done{background:var(--green);border-color:var(--green);color:#000;}
+.habit-day.today{border-color:var(--cyan);color:var(--cyan);}
+.habit-streak{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--orange);width:40px;text-align:right;}
+.habit-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color 0.2s;}
+.habit-del:hover{color:var(--pink);}
+
+/* ===================== PROGRESS / DASHBOARD ===================== */
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;}
+.bar-item{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--cyan),var(--purple));opacity:0.7;transition:opacity 0.2s;min-width:8px;}
+.bar-item:hover{opacity:1;}
+.achievement{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:10px;}
+.ach-icon{font-size:24px;width:40px;height:40px;background:var(--s3);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.ach-locked{opacity:0.4;filter:grayscale(1);}
+.ach-name{font-size:13px;font-weight:600;}
+.ach-desc{font-size:11px;color:var(--muted2);}
+
+/* ===================== FORMULA SHEET ===================== */
+.formula-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.formula-name{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;}
+.formula-eq{font-family:var(--mono);font-size:16px;color:var(--cyan);margin-bottom:6px;padding:8px 12px;background:var(--bg);border-radius:6px;}
+.formula-desc{font-size:12px;color:var(--muted2);line-height:1.5;}
+
+/* ===================== MISTAKE TRACKER ===================== */
+.mistake-item{padding:12px 14px;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--pink);border-radius:10px;}
+.mistake-q{font-size:13px;font-weight:500;margin-bottom:4px;}
+.mistake-meta{font-size:11px;color:var(--muted2);}
+.mistake-correct{font-size:12px;color:var(--green);margin-top:6px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:999;transform:translateX(120%);transition:transform 0.3s;box-shadow:0 8px 30px rgba(0,0,0,0.4);}
+.toast.show{transform:translateX(0);}
+.toast-icon{font-size:18px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:24px;width:480px;max-width:90vw;animation:fadeUp 0.2s ease;}
+.modal-title{font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:16px;}
+.modal-close{float:right;background:transparent;border:none;color:var(--muted2);font-size:20px;cursor:pointer;}
+
+/* ===== NEW FEATURES CSS ===== */
+.battle-option{padding:12px 16px;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:all .15s;background:var(--surface2);text-align:center;font-weight:600;}
+.battle-option:hover{border-color:var(--accent);transform:scale(1.02);}
+.battle-option.flash-c{background:rgba(110,231,183,.2);border-color:var(--green);}
+.battle-option.flash-w{background:rgba(244,114,182,.2);border-color:var(--accent3);}
+.exam-q-dot{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.exam-q-dot.answered{background:var(--accent);color:#000;border-color:var(--accent);}
+.exam-q-dot.cur{border-color:var(--yellow);}
+.hm-cell{width:12px;height:12px;border-radius:2px;background:var(--surface2);transition:transform .2s;}
+.hm-cell.l1{background:rgba(110,231,183,.2);}
+.hm-cell.l2{background:rgba(110,231,183,.5);}
+.hm-cell.l3{background:rgba(110,231,183,.8);}
+.hm-cell.l4{background:var(--accent);}
+.hm-cell:hover{transform:scale(1.4);}
+.wk-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.wk-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.wk-fill{height:100%;background:var(--accent3);border-radius:4px;}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .2s;}
+.note-card:hover{border-color:var(--accent);}
+.shop-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;transition:border-color .2s;}
+.shop-item:hover{border-color:var(--yellow);}
+.shop-item.owned{border-color:var(--green);}
+.iq-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .2s;}
+.iq-card:hover{border-color:var(--accent);}
+.vocab-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border2,#2a3448);border-radius:16px;padding:22px;width:500px;max-width:94vw;max-height:88vh;overflow-y:auto;}
+
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo">
+      <div class="logo-box">⚡</div>
+      <div>
+        <div class="logo-name">StudyMind</div>
+        <div class="logo-sub">AI Assistant</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Core</div>
+    <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard',this)">
+      <div class="nav-dot" style="background:var(--cyan)"></div>
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-btn" data-tab="chat" onclick="switchTab('chat',this)">
+      <div class="nav-dot" style="background:var(--cyan)"></div>
+      <span class="nav-icon">💬</span> Q&A Chatbot
+    </button>
+    <button class="nav-btn" data-tab="quiz" onclick="switchTab('quiz',this)">
+      <div class="nav-dot" style="background:var(--purple)"></div>
+      <span class="nav-icon">🎯</span> Quiz
+    </button>
+    <button class="nav-btn" data-tab="flashcards" onclick="switchTab('flashcards',this)">
+      <div class="nav-dot" style="background:var(--yellow)"></div>
+      <span class="nav-icon">🃏</span> Flashcards
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Tools</div>
+    <button class="nav-btn" data-tab="summarizer" onclick="switchTab('summarizer',this)">
+      <div class="nav-dot" style="background:var(--pink)"></div>
+      <span class="nav-icon">📄</span> Summarizer
+    </button>
+    <button class="nav-btn" data-tab="formulas" onclick="switchTab('formulas',this)">
+      <div class="nav-dot" style="background:var(--yellow)"></div>
+      <span class="nav-icon">🔢</span> Formula Sheet
+    </button>
+    <button class="nav-btn" data-tab="studyplan" onclick="switchTab('studyplan',this)">
+      <div class="nav-dot" style="background:var(--orange)"></div>
+      <span class="nav-icon">📅</span> Study Plan
+    </button>
+    <button class="nav-btn" data-tab="pomodoro" onclick="switchTab('pomodoro',this)">
+      <div class="nav-dot" style="background:var(--green)"></div>
+      <span class="nav-icon">⏱️</span> Pomodoro
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Tracking</div>
+    <button class="nav-btn" data-tab="habits" onclick="switchTab('habits',this)">
+      <div class="nav-dot" style="background:var(--orange)"></div>
+      <span class="nav-icon">✅</span> Habit Tracker
+    </button>
+    <button class="nav-btn" data-tab="mistakes" onclick="switchTab('mistakes',this)">
+      <div class="nav-dot" style="background:var(--pink)"></div>
+      <span class="nav-icon">❌</span> Mistake Log
+    </button>
+    <button class="nav-btn" data-tab="achievements" onclick="switchTab('achievements',this)">
+      <div class="nav-dot" style="background:var(--yellow)"></div>
+      <span class="nav-icon">🏆</span> Achievements
+    </button>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="xp-bar-wrap">
+      <div class="xp-label">
+        <span id="xpLabel">XP Progress</span>
+        <span id="xpCount" style="color:var(--cyan)">0/100</span>
+      </div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    </div>
+    <div class="level-badge">
+      <div class="level-icon" id="levelIcon">🌱</div>
+      <div><div class="level-name" id="levelName">Seedling</div><div class="level-text">Level <span id="levelNum">1</span></div></div>
+    </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--muted2)">🪙 Coins</span>
+        <span id="coinsDisplay" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--yellow)">0</span>
+      </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title" id="pageTitle">// dashboard</div>
+      <div class="page-sub" id="pageSub">Your study overview at a glance</div>
+    </div>
+    <div class="topbar-right">
+      <div class="streak-badge">🔥 <span id="streakCount">0</span> day streak</div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+<!-- ======================== DASHBOARD ======================== -->
+<div class="tab active" id="tab-dashboard">
+  <div class="g4">
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-val" id="statQuizzes" style="color:var(--cyan)">0</div>
+      <div class="stat-lbl">Quizzes Taken</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-val" id="statScore" style="color:var(--green)">0%</div>
+      <div class="stat-lbl">Avg. Score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-val" id="statPomo" style="color:var(--yellow)">0</div>
+      <div class="stat-lbl">Pomodoros Done</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-val" id="statHabits" style="color:var(--orange)">0%</div>
+      <div class="stat-lbl">Habits Today</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="section-label">Quiz Performance (Last 7)</div>
+      <div class="mini-chart" id="dashChart" style="margin-top:8px;"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <span style="font-size:10px;color:var(--muted)">Mon</span>
+        <span style="font-size:10px;color:var(--muted)">Tue</span>
+        <span style="font-size:10px;color:var(--muted)">Wed</span>
+        <span style="font-size:10px;color:var(--muted)">Thu</span>
+        <span style="font-size:10px;color:var(--muted)">Fri</span>
+        <span style="font-size:10px;color:var(--muted)">Sat</span>
+        <span style="font-size:10px;color:var(--muted)">Sun</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-label">Today's Tasks</div>
+      <div id="todayTasks" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No study plan generated yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Recent Achievements</div>
+    <div class="g3" id="dashAchievements" style="margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- ======================== CHAT ======================== -->
+<div class="tab" id="tab-chat">
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chatMsgs">
+      <div class="msg ai">
+        <div class="avatar ai-av">⚡</div>
+        <div class="bubble">Hey! I'm StudyMind AI 🧠 I have deep knowledge in <strong>Python, Java, C++, JavaScript, Data Structures, Algorithms, OS, DBMS, Networking</strong> and more. Ask me anything! I'll give you code examples too.</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea id="chatIn" placeholder="Ask anything... e.g. What is a binary tree? How does Python work?" onkeydown="chatKey(event)"></textarea>
+      <button class="btn btn-cyan btn-sm" onclick="sendChat()">Send ↑</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-label">Quick Topics</div>
+    <div class="quick-chips" style="margin-top:6px;">
+      <div class="chip" onclick="qChat('What is Python and why is it popular?')">🐍 Python</div>
+      <div class="chip" onclick="qChat('Explain Java OOP concepts')">☕ Java OOP</div>
+      <div class="chip" onclick="qChat('What is a binary tree?')">🌳 Binary Tree</div>
+      <div class="chip" onclick="qChat('Explain Big O notation')">📈 Big O</div>
+      <div class="chip" onclick="qChat('What is recursion?')">🔄 Recursion</div>
+      <div class="chip" onclick="qChat('What is SQL and how does it work?')">🗄️ SQL</div>
+      <div class="chip" onclick="qChat('Explain how the internet works')">🌐 Internet</div>
+      <div class="chip" onclick="qChat('What is machine learning?')">🤖 ML</div>
+      <div class="chip" onclick="qChat('What is a linked list?')">🔗 Linked List</div>
+      <div class="chip" onclick="qChat('Explain sorting algorithms')">📊 Sorting</div>
+      <div class="chip" onclick="qChat('What is JavaScript?')">💛 JavaScript</div>
+      <div class="chip" onclick="qChat('What is C++ used for?')">⚙️ C++</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== QUIZ ======================== -->
+<div class="tab" id="tab-quiz">
+  <div id="quizSetup" class="card">
+    <div class="section-label">Configure Quiz</div>
+    <div class="g2" style="margin-top:10px;">
+      <div><label>Subject</label>
+        <select id="qSubj">
+          <option>Python</option><option>Java</option><option>C++</option>
+          <option>JavaScript</option><option>Data Structures</option>
+          <option>Algorithms</option><option>DBMS</option>
+          <option>Networking</option><option>Operating Systems</option>
+          <option>Mathematics</option><option>Science</option><option>History</option>
+        </select>
+      </div>
+      <div><label>Difficulty</label>
+        <select id="qDiff"><option>Easy</option><option selected>Medium</option><option>Hard</option></select>
+      </div>
+      <div><label>Questions</label>
+        <select id="qCount"><option>3</option><option selected>5</option><option>10</option></select>
+      </div>
+      <div style="display:flex;align-items:flex-end;">
+        <button class="btn btn-purple" style="width:100%" onclick="startQuiz()">🎯 Start Quiz</button>
+      </div>
+    </div>
+  </div>
+  <div id="quizActive" style="display:none;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span id="qProgressTxt" style="font-size:12px;color:var(--muted2);font-family:var(--mono)">Q 1 / 5</span>
+      <span style="font-size:12px;color:var(--muted2)">Score: <span id="qScoreTxt" style="color:var(--cyan);font-weight:700">0</span></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="qProgBar" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--cyan))"></div></div>
+    <div class="card" id="qCard">
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:10px;font-family:var(--mono)" id="qMeta">PYTHON · EASY</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:16px;line-height:1.5" id="qText"></div>
+      <div id="qOptions" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div id="qFeedback" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <button class="btn btn-ghost btn-sm" onclick="resetQuiz()">↩ Quit</button>
+      <button class="btn btn-purple btn-sm" id="qNextBtn" onclick="nextQ()" disabled>Next →</button>
+    </div>
+  </div>
+  <div id="quizResult" style="display:none;">
+    <div class="card" style="text-align:center;padding:40px;">
+      <div style="font-size:56px;margin-bottom:10px" id="resEmoji">🏆</div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;margin-bottom:6px" id="resTitle"></div>
+      <div style="color:var(--muted2);margin-bottom:24px" id="resScore"></div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-purple" onclick="resetQuiz()">Try Again 🔄</button>
+        <button class="btn btn-ghost" onclick="switchTab('mistakes',document.querySelector('[data-tab=mistakes]'))">View Mistakes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== FLASHCARDS ======================== -->
+<div class="tab" id="tab-flashcards">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <select id="fcSubject" style="width:200px" onchange="loadFlashcards()">
+        <option>Python</option><option>Java</option><option>Data Structures</option>
+        <option>Algorithms</option><option>JavaScript</option><option>C++</option><option>DBMS</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span id="fcProgress" style="font-family:var(--mono);font-size:12px;color:var(--muted2)">0 / 0</span>
+      <button class="btn btn-ghost btn-sm" onclick="prevFC()">← Prev</button>
+      <button class="btn btn-yellow btn-sm" onclick="nextFC()">Next →</button>
+    </div>
+  </div>
+
+  <div class="flashcard" id="flashcard" onclick="flipCard()">
+    <div class="flashcard-inner">
+      <div class="flashcard-front">
+        <div class="fc-subj" id="fcSubjLabel" style="color:var(--yellow)">PYTHON</div>
+        <div class="fc-q" id="fcQ">Click a subject to load flashcards</div>
+        <div class="fc-hint">👆 Tap to reveal answer</div>
+      </div>
+      <div class="flashcard-back">
+        <div class="fc-subj" style="color:var(--cyan)">ANSWER</div>
+        <div class="fc-a" id="fcA"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:center;">
+    <button class="btn btn-pink btn-sm" onclick="markFC('hard')">😓 Hard</button>
+    <button class="btn btn-ghost btn-sm" onclick="markFC('ok')">😐 OK</button>
+    <button class="btn btn-green btn-sm" onclick="markFC('easy')">😊 Easy</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Flashcard Stats</div>
+    <div class="g3" style="margin-top:8px;">
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--mono);font-size:20px;color:var(--green)" id="fcEasy">0</div><div style="font-size:11px;color:var(--muted2)">Easy</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--mono);font-size:20px;color:var(--yellow)" id="fcOk">0</div><div style="font-size:11px;color:var(--muted2)">OK</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--mono);font-size:20px;color:var(--pink)" id="fcHard">0</div><div style="font-size:11px;color:var(--muted2)">Hard</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== SUMMARIZER ======================== -->
+<div class="tab" id="tab-summarizer">
+  <div class="g2">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="section-label">Paste Your Notes</div>
+      <textarea id="sumInput" style="height:260px" placeholder="Paste notes, textbook content, or any text here..."></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-pink btn-sm" onclick="doSummarize()">✨ Summarize</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('sumInput').value=''">Clear</button>
+      </div>
+      <div class="card-sm">
+        <div class="section-label">Load Sample</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <div class="chip" onclick="loadSample('python')">🐍 Python</div>
+          <div class="chip" onclick="loadSample('ds')">🌳 Data Structures</div>
+          <div class="chip" onclick="loadSample('networks')">🌐 Networks</div>
+          <div class="chip" onclick="loadSample('os')">💻 OS</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="section-label">Summary</div>
+      <div id="sumOutput" style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px;min-height:160px;font-size:13px;line-height:1.8;color:var(--muted2);">
+        Summary will appear here...
+      </div>
+      <div id="sumKeyPoints" style="display:none;">
+        <div class="section-label">Key Points</div>
+        <div id="sumKPList" style="display:flex;flex-direction:column;gap:7px;margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== FORMULA SHEET ======================== -->
+<div class="tab" id="tab-formulas">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <select id="formulaSubj" style="width:200px" onchange="loadFormulas()">
+      <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
+      <option>Data Structures</option><option>Algorithms</option>
+    </select>
+    <input type="text" id="formulaSearch" placeholder="Search formulas..." style="width:220px" oninput="filterFormulas()"/>
+    <button class="btn btn-yellow btn-sm" onclick="printFormulas()">🖨️ Print</button>
+  </div>
+  <div class="g3" id="formulaGrid" style="margin-top:4px;"></div>
+</div>
+
+<!-- ======================== STUDY PLAN ======================== -->
+<div class="tab" id="tab-studyplan">
+  <div class="card">
+    <div class="section-label">Create Your Study Plan</div>
+    <div class="g2" style="margin-top:10px;">
+      <div><label>Your Name</label><input type="text" id="spName" placeholder="e.g. Arjun"/></div>
+      <div><label>Exam / Goal</label><input type="text" id="spExam" placeholder="e.g. JEE, GATE, Finals..."/></div>
+      <div><label>Subjects (comma separated)</label><input type="text" id="spSubjects" placeholder="Python, DSA, Math, Physics"/></div>
+      <div><label>Weak Areas</label><input type="text" id="spWeak" placeholder="e.g. Recursion, Integration"/></div>
+      <div><label>Hours Per Day</label>
+        <select id="spHours"><option>2 hours</option><option>3 hours</option><option selected>4 hours</option><option>6 hours</option><option>8 hours</option></select>
+      </div>
+      <div><label>Days Until Exam</label>
+        <select id="spDays"><option>3</option><option>7</option><option selected>14</option><option>30</option></select>
+      </div>
+    </div>
+    <button class="btn btn-orange" style="margin-top:14px" onclick="genPlan()">📅 Generate Plan</button>
+  </div>
+  <div id="planOut" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- ======================== POMODORO ======================== -->
+<div class="tab" id="tab-pomodoro">
+  <div class="g2">
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 20px;">
+      <div class="pomo-circle work" id="pomoCircle">
+        <div class="pomo-time" id="pomoTime">25:00</div>
+        <div class="pomo-label" id="pomoLabel">FOCUS</div>
+      </div>
+      <div class="pomo-sessions" id="pomoDots"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-green" id="pomoBtn" onclick="togglePomo()">▶ Start</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetPomo()">⟳ Reset</button>
+        <button class="btn btn-ghost btn-sm" onclick="skipPomo()">⏭ Skip</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted2);text-align:center">Sessions today: <span id="pomoCount" style="color:var(--green);font-weight:700">0</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card">
+        <div class="section-label">Timer Settings</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+          <div><label>Focus Duration (min)</label><input type="number" id="pomoFocus" value="25" min="1" max="60" onchange="resetPomo()"/></div>
+          <div><label>Short Break (min)</label><input type="number" id="pomoBreak" value="5" min="1" max="30" onchange="resetPomo()"/></div>
+          <div><label>Long Break (min)</label><input type="number" id="pomoLong" value="15" min="1" max="60" onchange="resetPomo()"/></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Session Log</div>
+        <div id="pomoLog" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:160px;overflow-y:auto;">
+          <div style="font-size:12px;color:var(--muted)">No sessions yet today.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== HABITS ======================== -->
+<div class="tab" id="tab-habits">
+  <div class="card">
+    <div class="section-label">Add New Habit</div>
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+      <input type="text" id="habitName" placeholder="e.g. Read 30 mins, Practice DSA, Exercise..." style="flex:1;min-width:200px"/>
+      <select id="habitColor" style="width:140px;">
+        <option value="cyan">Cyan</option><option value="green">Green</option>
+        <option value="pink">Pink</option><option value="yellow">Yellow</option>
+        <option value="purple">Purple</option><option value="orange">Orange</option>
+      </select>
+      <button class="btn btn-orange btn-sm" onclick="addHabit()">+ Add Habit</button>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <div class="chip" onclick="addPresetHabit('📖 Read 30 mins','cyan')">📖 Read 30 mins</div>
+      <div class="chip" onclick="addPresetHabit('💻 Practice DSA','purple')">💻 Practice DSA</div>
+      <div class="chip" onclick="addPresetHabit('🏃 Exercise','green')">🏃 Exercise</div>
+      <div class="chip" onclick="addPresetHabit('📝 Review Notes','yellow')">📝 Review Notes</div>
+      <div class="chip" onclick="addPresetHabit('🧘 Meditate','pink')">🧘 Meditate</div>
+      <div class="chip" onclick="addPresetHabit('💧 Drink Water','cyan')">💧 Drink Water</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="section-label" style="margin-bottom:0">This Week</div>
+    <div style="font-size:12px;color:var(--muted2)" id="habitWeekLabel"></div>
+  </div>
+
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+    <div style="display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);gap:12px;">
+      <div style="flex:1;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.08em;">HABIT</div>
+      <div class="habit-days" id="habitDayHeaders"></div>
+      <div style="width:40px;font-size:11px;font-weight:700;color:var(--muted);text-align:right;letter-spacing:0.08em;">STREAK</div>
+      <div style="width:24px;"></div>
+    </div>
+    <div id="habitList" style="display:flex;flex-direction:column;">
+      <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Add habits above to start tracking!</div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val" id="bestStreak" style="color:var(--orange)">0</div><div class="stat-lbl">Best Streak</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-val" id="todayDone" style="color:var(--green)">0/0</div><div class="stat-lbl">Today Complete</div></div>
+    <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-val" id="totalCheckins" style="color:var(--purple)">0</div><div class="stat-lbl">Total Check-ins</div></div>
+  </div>
+</div>
+
+<!-- ======================== MISTAKES ======================== -->
+<div class="tab" id="tab-mistakes">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="section-label" style="margin-bottom:0">Logged Mistakes (<span id="mistakeCount">0</span>)</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="clearMistakes()">Clear All</button>
+      <button class="btn btn-purple btn-sm" onclick="retryMistakes()">🔁 Retry Mistakes</button>
+    </div>
+  </div>
+  <div id="mistakeList" style="display:flex;flex-direction:column;gap:10px;">
+    <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No mistakes logged yet. Take a quiz to start!</div>
+  </div>
+</div>
+
+<!-- ======================== ACHIEVEMENTS ======================== -->
+<div class="tab" id="tab-achievements">
+  <div class="section-label">Badges & Achievements</div>
+  <div class="g3" id="achievementGrid"></div>
+</div>
+
+  </div><!-- content -->
+</div><!-- main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">⚡</span>
+  <span id="toastMsg">Achievement unlocked!</span>
+</div>
+
+<!-- MODAL (retry mistakes) -->
+<div class="modal-overlay" id="retryModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">// retry_mistakes.exe</div>
+    <div id="retryContent"></div>
+  </div>
+</div>
+
+<script>
+// ===================== STATE =====================
+let state = {
+  xp: 0, level: 1, streak: 0,
+  quizzesTaken: 0, totalScore: 0,
+  pomodorosDone: 0,
+  scoreHistory: [0,0,0,0,0,0,0],
+  unlockedAchievements: [],
+  mistakes: [],
+  habits: [],
+  fcStats: {easy:0, ok:0, hard:0},
+  planTasks: []
+};
+
+function save() { try { localStorage.setItem('studymind', JSON.stringify(state)); } catch(e){} }
+function load() { try { const d = localStorage.getItem('studymind'); if(d) state = {...state, ...JSON.parse(d)}; } catch(e){} }
+load();
+
+// ===================== NAV =====================
+const pageMeta = {
+  dashboard:   ['// dashboard',    'Your study command center'],
+  chat:        ['// qa_chatbot',   'Ask anything — get expert answers with code examples'],
+  quiz:        ['// quiz_engine',  'Test your knowledge across CS and more'],
+  flashcards:  ['// flashcards',   'Flip through key concepts to reinforce memory'],
+  summarizer:  ['// summarizer',   'Paste notes and get instant AI summaries'],
+  formulas:    ['// formula_sheet','Quick reference for equations and formulas'],
+  studyplan:   ['// study_planner','Generate your personalized day-by-day schedule'],
+  pomodoro:    ['// focus_timer',  'Stay focused with the Pomodoro technique'],
+  habits:      ['// habit_tracker','Build consistent study habits day by day'],
+  mistakes:    ['// mistake_log',  'Review your wrong answers and learn from them'],
+  achievements:['// achievements', 'Unlock badges as you study and improve'],
+};
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const [title, sub] = pageMeta[id] || ['//page', ''];
+  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageSub').textContent = sub;
+  if(id === 'dashboard') refreshDashboard();
+  if(id === 'achievements') renderAchievements();
+  if(id === 'flashcards') loadFlashcards();
+  if(id === 'formulas') loadFormulas();
+  if(id === 'habits') renderHabits();
+  if(id === 'mistakes') renderMistakes();
+}
+
+// ===================== THEME =====================
+function toggleTheme() { document.body.classList.toggle('light'); }
+
+// ===================== XP / LEVEL =====================
+const levels = [
+  {name:'Seedling',icon:'🌱',xp:0},{name:'Scholar',icon:'📚',xp:100},
+  {name:'Coder',icon:'💻',xp:250},{name:'Debugger',icon:'🔍',xp:500},
+  {name:'Architect',icon:'🏗️',xp:800},{name:'Algorithm',icon:'⚡',xp:1200},
+  {name:'Genius',icon:'🧠',xp:1800},{name:'Einstein',icon:'🌌',xp:2500},
+];
+
+function addXP(amount, reason='') {
+  state.xp += amount;
+  let lvl = 0;
+  for(let i = levels.length-1; i>=0; i--) { if(state.xp >= levels[i].xp) { lvl = i; break; } }
+  state.level = lvl + 1;
+  const cur = levels[lvl];
+  const next = levels[lvl+1];
+  document.getElementById('levelIcon').textContent = cur.icon;
+  document.getElementById('levelName').textContent = cur.name;
+  document.getElementById('levelNum').textContent = state.level;
+  const progress = next ? Math.round(((state.xp - cur.xp) / (next.xp - cur.xp)) * 100) : 100;
+  document.getElementById('xpFill').style.width = progress + '%';
+  document.getElementById('xpCount').textContent = `${state.xp}/${next ? next.xp : state.xp}`;
+  if(reason) showToast('⚡', `+${amount} XP — ${reason}`);
+  checkAchievements();
+  save();
+}
+
+// ===================== TOAST =====================
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===================== ACHIEVEMENTS =====================
+const ALL_ACH = [
+  {id:'first_quiz',icon:'🎯',name:'First Quiz',desc:'Complete your first quiz',condition:()=>state.quizzesTaken>=1},
+  {id:'quiz5',icon:'🧩',name:'Quiz Addict',desc:'Complete 5 quizzes',condition:()=>state.quizzesTaken>=5},
+  {id:'perfect',icon:'💯',name:'Perfect Score',desc:'Score 100% on a quiz',condition:()=>state.unlockedAchievements.includes('perfect')},
+  {id:'pomo1',icon:'🍅',name:'First Pomodoro',desc:'Complete your first Pomodoro',condition:()=>state.pomodorosDone>=1},
+  {id:'pomo10',icon:'🔥',name:'Focus Master',desc:'Complete 10 Pomodoros',condition:()=>state.pomodorosDone>=10},
+  {id:'streak3',icon:'⚡',name:'3-Day Streak',desc:'Study 3 days in a row',condition:()=>state.streak>=3},
+  {id:'streak7',icon:'🌟',name:'Week Warrior',desc:'Study 7 days in a row',condition:()=>state.streak>=7},
+  {id:'xp500',icon:'🚀',name:'XP Rocket',desc:'Earn 500 XP',condition:()=>state.xp>=500},
+  {id:'habits5',icon:'✅',name:'Habit Builder',desc:'Add 5 habits',condition:()=>state.habits.length>=5},
+  {id:'fc50',icon:'🃏',name:'Card Shark',desc:'Review 50 flashcards',condition:()=>(state.fcStats.easy+state.fcStats.ok+state.fcStats.hard)>=50},
+  {id:'nochill',icon:'😤',name:'No Days Off',desc:'Check in every habit for 7 days',condition:()=>state.streak>=7},
+  {id:'scholar',icon:'👑',name:'True Scholar',desc:'Reach Scholar level',condition:()=>state.xp>=100},
+];
+
+function checkAchievements() {
+  ALL_ACH.forEach(a => {
+    if(!state.unlockedAchievements.includes(a.id) && a.condition()) {
+      state.unlockedAchievements.push(a.id);
+      showToast(a.icon, `Achievement: ${a.name}!`);
+      save();
+    }
+  });
+}
+
+function renderAchievements() {
+  const grid = document.getElementById('achievementGrid');
+  grid.innerHTML = ALL_ACH.map(a => {
+    const unlocked = state.unlockedAchievements.includes(a.id);
+    return `<div class="achievement ${unlocked?'':'ach-locked'}">
+      <div class="ach-icon">${a.icon}</div>
+      <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('dashAchievements').innerHTML = ALL_ACH.slice(0,3).map(a => {
+    const u = state.unlockedAchievements.includes(a.id);
+    return `<div class="achievement ${u?'':'ach-locked'}">
+      <div class="ach-icon">${a.icon}</div>
+      <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== DASHBOARD =====================
+function refreshDashboard() {
+  document.getElementById('statQuizzes').textContent = state.quizzesTaken;
+  const avg = state.quizzesTaken > 0 ? Math.round(state.totalScore/state.quizzesTaken) : 0;
+  document.getElementById('statScore').textContent = avg + '%';
+  document.getElementById('statPomo').textContent = state.pomodorosDone;
+  const habits = state.habits;
+  const today = new Date().getDay();
+  const done = habits.filter(h => h.days && h.days[today]).length;
+  document.getElementById('statHabits').textContent = habits.length ? Math.round(done/habits.length*100)+'%' : '0%';
+  document.getElementById('streakCount').textContent = state.streak;
+
+  const chart = document.getElementById('dashChart');
+  chart.innerHTML = state.scoreHistory.map(s =>
+    `<div class="bar-item" style="height:${Math.max(4, s*0.6)}px;title='${s}%'"></div>`
+  ).join('');
+
+  renderAchievements();
+}
+
+// ===================== HUGE CSE KNOWLEDGE BASE =====================
+const KB = {
+  'python': {
+    summary: `Python is a high-level, interpreted, general-purpose programming language created by Guido van Rossum in 1991. It emphasizes code readability and uses indentation to define code blocks instead of curly braces.`,
+    points: ['Interpreted language — runs line by line', 'Dynamically typed — no need to declare variable types', 'Huge standard library + pip ecosystem', 'Used in Web Dev, AI/ML, Data Science, Automation, Scripting', 'Key frameworks: Django, Flask, FastAPI, TensorFlow, PyTorch'],
+    code: `# Python Basics Example\nname = "StudyMind"\nversion = 3.11\n\n# List comprehension\nsquares = [x**2 for x in range(1, 6)]\nprint(squares)  # [1, 4, 9, 16, 25]\n\n# Function\ndef greet(name):\n    return f"Hello, {name}!"\n\n# Class\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n    def grade(self):\n        return 'A' if self.score >= 90 else 'B'`,
+    reply: `Python is one of the most popular programming languages in the world 🐍\n\nCreated by Guido van Rossum in 1991, Python is known for its clean syntax and readability. Here's what makes it special:`
+  },
+  'java': {
+    summary: `Java is a class-based, object-oriented language designed by James Gosling at Sun Microsystems in 1995. It follows "Write Once, Run Anywhere" via the JVM.`,
+    points: ['Object-Oriented: Encapsulation, Inheritance, Polymorphism, Abstraction', 'Strongly typed and compiled to bytecode', 'JVM runs bytecode on any platform', 'Used in Android, Enterprise, Web backends', 'Key concepts: Classes, Interfaces, Generics, Threads'],
+    code: `// Java OOP Example\npublic class Animal {\n    private String name;\n    \n    public Animal(String name) {\n        this.name = name;\n    }\n    \n    public void speak() {\n        System.out.println(name + " makes a sound");\n    }\n}\n\nclass Dog extends Animal {\n    public Dog(String name) { super(name); }\n    \n    @Override\n    public void speak() {\n        System.out.println("Dog barks!");\n    }\n}`,
+    reply: `Java is a powerful, object-oriented language popular for enterprise and Android apps ☕\n\nKey OOP concepts in Java:`
+  },
+  'c++': {
+    summary: `C++ is a general-purpose language created by Bjarne Stroustrup as an extension of C in 1979. It supports both procedural and object-oriented programming.`,
+    points: ['Superset of C — direct memory management', 'STL: vectors, maps, sets, stacks, queues', 'Used in: Game dev, OS, Competitive Programming, Embedded', 'Supports pointers, references, templates', 'Faster than Java/Python for performance-critical apps'],
+    code: `// C++ Example\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nclass Stack {\n    vector<int> data;\npublic:\n    void push(int x) { data.push_back(x); }\n    int pop() { int x=data.back(); data.pop_back(); return x; }\n    bool empty() { return data.empty(); }\n};\n\nint main() {\n    Stack s;\n    s.push(10); s.push(20);\n    cout << s.pop(); // 20\n    return 0;\n}`,
+    reply: `C++ is a powerful systems language — the backbone of OS, games, and competitive programming ⚙️`
+  },
+  'javascript': {
+    summary: `JavaScript is a lightweight, interpreted scripting language that runs in browsers and on servers (Node.js). Created by Brendan Eich at Netscape in 1995.`,
+    points: ['Runs natively in all browsers', 'Asynchronous: callbacks, promises, async/await', 'DOM manipulation for web interactivity', 'Node.js for server-side JavaScript', 'Frameworks: React, Vue, Angular, Next.js, Express'],
+    code: `// JavaScript Example\nconst greet = (name) => \`Hello, \${name}!\`;\n\n// Promises & Async\nconst fetchData = async () => {\n  try {\n    const res = await fetch('https://api.example.com/data');\n    const data = await res.json();\n    return data;\n  } catch(err) {\n    console.error(err);\n  }\n};\n\n// Array methods\nconst nums = [1,2,3,4,5];\nconst evens = nums.filter(n => n % 2 === 0);\nconst doubled = nums.map(n => n * 2);`,
+    reply: `JavaScript is THE language of the web 💛 It powers both front-end and back-end development.`
+  },
+  'binary tree': {
+    summary: `A binary tree is a hierarchical data structure where each node has at most 2 children: left and right. It forms the basis for BSTs, Heaps, and expression trees.`,
+    points: ['Each node: data + left pointer + right pointer', 'BST: left < root < right', 'Traversals: Inorder (LNR), Preorder (NLR), Postorder (LRN)', 'Height of tree = O(log n) for balanced, O(n) worst case', 'Used in: File systems, databases, expression parsers'],
+    code: `// Binary Tree in Python\nclass Node:\n    def __init__(self, val):\n        self.val = val\n        self.left = None\n        self.right = None\n\ndef inorder(root):\n    if root:\n        inorder(root.left)\n        print(root.val, end=' ')\n        inorder(root.right)\n\n# Build tree\nroot = Node(1)\nroot.left = Node(2)\nroot.right = Node(3)\nroot.left.left = Node(4)\ninorder(root)  # Output: 4 2 1 3`,
+    reply: `A Binary Tree is one of the most fundamental data structures in CS 🌳`
+  },
+  'linked list': {
+    summary: `A linked list is a linear data structure where elements (nodes) are connected via pointers. Unlike arrays, elements aren't stored in contiguous memory.`,
+    points: ['Node = data + pointer to next node', 'Types: Singly, Doubly, Circular', 'Insert/Delete at head: O(1)', 'Search: O(n) — no random access', 'Used in: Stacks, Queues, Adjacency lists, Undo operations'],
+    code: `// Linked List in Python\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n    \n    def append(self, data):\n        new = Node(data)\n        if not self.head:\n            self.head = new; return\n        cur = self.head\n        while cur.next: cur = cur.next\n        cur.next = new\n    \n    def display(self):\n        cur = self.head\n        while cur:\n            print(cur.data, '->', end=' ')\n            cur = cur.next`,
+    reply: `A Linked List is a dynamic data structure where each node points to the next 🔗`
+  },
+  'recursion': {
+    summary: `Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem. It has a base case to stop and a recursive case.`,
+    points: ['Base case: condition that stops recursion', 'Recursive case: function calls itself with simpler input', 'Call stack grows with each call — risk of stack overflow', 'Time complexity often T(n) = T(n-1) + O(1)', 'Used in: DFS, Fibonacci, Merge Sort, Tree traversal, Backtracking'],
+    code: `# Recursion Examples\n\n# Fibonacci\ndef fib(n):\n    if n <= 1: return n        # base case\n    return fib(n-1) + fib(n-2)  # recursive case\n\n# Factorial\ndef factorial(n):\n    if n == 0: return 1\n    return n * factorial(n-1)\n\n# Tower of Hanoi\ndef hanoi(n, src, dest, aux):\n    if n == 1:\n        print(f"Move disk 1 from {src} to {dest}")\n        return\n    hanoi(n-1, src, aux, dest)\n    print(f"Move disk {n} from {src} to {dest}")\n    hanoi(n-1, aux, dest, src)`,
+    reply: `Recursion is the art of solving a problem by breaking it into smaller versions of itself 🔄`
+  },
+  'big o': {
+    summary: `Big O notation describes the time or space complexity of an algorithm in terms of input size n. It expresses the worst-case growth rate.`,
+    points: ['O(1) — Constant: array indexing, hash lookup', 'O(log n) — Logarithmic: binary search, balanced BST', 'O(n) — Linear: linear search, single loop', 'O(n log n) — Merge sort, Heap sort', 'O(n²) — Quadratic: bubble sort, nested loops', 'O(2ⁿ) — Exponential: naive Fibonacci, subset problems'],
+    code: `# Big O Examples\n\n# O(1) — constant\ndef get_first(arr): return arr[0]\n\n# O(n) — linear\ndef find(arr, x):\n    for item in arr:\n        if item == x: return True\n    return False\n\n# O(n²) — quadratic\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n\n# O(log n) — binary search\ndef binary_search(arr, x):\n    lo, hi = 0, len(arr)-1\n    while lo <= hi:\n        mid = (lo+hi)//2\n        if arr[mid] == x: return mid\n        elif arr[mid] < x: lo = mid+1\n        else: hi = mid-1\n    return -1`,
+    reply: `Big O notation is the language we use to describe algorithm efficiency 📈`
+  },
+  'sorting': {
+    summary: `Sorting algorithms arrange elements in a defined order. Each has different time/space complexity trade-offs.`,
+    points: ['Bubble Sort: O(n²) — swap adjacent if out of order', 'Selection Sort: O(n²) — find min, swap to front', 'Insertion Sort: O(n²) avg, O(n) best — good for nearly sorted', 'Merge Sort: O(n log n) — divide and conquer, stable', 'Quick Sort: O(n log n) avg, O(n²) worst — pivot-based', 'Heap Sort: O(n log n) — uses max heap'],
+    code: `# Merge Sort (O(n log n))\ndef merge_sort(arr):\n    if len(arr) <= 1: return arr\n    mid = len(arr)//2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)\n\ndef merge(left, right):\n    result = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            result.append(left[i]); i+=1\n        else:\n            result.append(right[j]); j+=1\n    return result + left[i:] + right[j:]`,
+    reply: `Sorting algorithms are core to CS interviews and problem solving 📊`
+  },
+  'sql': {
+    summary: `SQL (Structured Query Language) is the standard language for managing relational databases. It handles data querying, insertion, updating, and deletion.`,
+    points: ['DDL: CREATE, ALTER, DROP — defines schema', 'DML: SELECT, INSERT, UPDATE, DELETE — manipulates data', 'JOIN types: INNER, LEFT, RIGHT, FULL OUTER', 'Aggregate functions: COUNT, SUM, AVG, MAX, MIN', 'GROUP BY, HAVING, ORDER BY, LIMIT', 'ACID properties: Atomicity, Consistency, Isolation, Durability'],
+    code: `-- SQL Examples\nCREATE TABLE Students (\n  id INT PRIMARY KEY,\n  name VARCHAR(50),\n  score FLOAT,\n  subject VARCHAR(30)\n);\n\n-- SELECT with JOIN\nSELECT s.name, s.score, c.course_name\nFROM Students s\nINNER JOIN Courses c ON s.id = c.student_id\nWHERE s.score > 75\nORDER BY s.score DESC;\n\n-- Aggregate\nSELECT subject, AVG(score) as avg_score\nFROM Students\nGROUP BY subject\nHAVING AVG(score) > 70;`,
+    reply: `SQL is the universal language of databases 🗄️ Every software engineer must know it.`
+  },
+  'machine learning': {
+    summary: `Machine Learning is a subset of AI where systems learn from data to make predictions or decisions without being explicitly programmed.`,
+    points: ['Supervised: labeled data → regression, classification', 'Unsupervised: unlabeled data → clustering, PCA', 'Reinforcement: agent learns via rewards', 'Key algorithms: Linear Regression, Decision Trees, Neural Networks, SVM, K-Means', 'Python libraries: scikit-learn, TensorFlow, PyTorch, Keras', 'Steps: Data → Preprocessing → Model → Train → Evaluate → Deploy'],
+    code: `# Simple ML with scikit-learn\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.model_selection import train_test_split\nimport numpy as np\n\n# Generate data\nX = np.array([[1],[2],[3],[4],[5]])\ny = np.array([2,4,6,8,10])\n\n# Train\nmodel = LinearRegression()\nmodel.fit(X, y)\n\n# Predict\nprint(model.predict([[6]]))  # [12.0]`,
+    reply: `Machine Learning is transforming every industry 🤖 Let me give you a solid overview:`
+  },
+  'internet': {
+    summary: `The internet is a global network of interconnected computers that communicate using standardized protocols, primarily TCP/IP.`,
+    points: ['DNS: translates domain names to IP addresses', 'HTTP/HTTPS: protocol for web communication', 'TCP/IP: transmission and addressing protocol', 'Packets: data split into small chunks for transmission', 'Client-Server model: browser (client) requests, server responds', 'OSI Model: 7 layers from Physical to Application'],
+    code: `# How HTTP works (simplified)\n# 1. You type: www.google.com\n# 2. DNS resolves → IP: 142.250.195.78\n# 3. TCP handshake with server\n# 4. Browser sends HTTP GET request:\n\nGET / HTTP/1.1\nHost: www.google.com\nAccept: text/html\n\n# 5. Server responds:\nHTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>...</html>`,
+    reply: `The internet is the backbone of modern civilization 🌐 Here's how it works:`
+  },
+};
+
+// ===================== CHAT =====================
+function sendChat() {
+  const inp = document.getElementById('chatIn');
+  const msg = inp.value.trim(); if(!msg) return;
+  addMsg(msg, 'user'); inp.value = '';
+  showTypingIndicator();
+  setTimeout(() => {
+    removeTyping();
+    const resp = getReply(msg);
+    addMsg(resp.text, 'ai', resp.code);
+    addXP(5, 'asked a question');
+  }, 900 + Math.random() * 600);
+}
+
+function qChat(msg) { document.getElementById('chatIn').value = msg; sendChat(); }
+
+function chatKey(e) { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+
+function getReply(msg) {
+  const lower = msg.toLowerCase();
+  for(const [key, data] of Object.entries(KB)) {
+    if(lower.includes(key)) {
+      let text = data.reply + '\n\n';
+      text += data.points.map((p,i) => `${i+1}. ${p}`).join('\n');
+      return { text, code: data.code };
+    }
+  }
+  return {
+    text: `Great question! Here's a breakdown of "${msg}":\n\nThis is an important concept in computer science and software engineering. The key is to understand the underlying principle — break it down into smaller parts, connect it to what you already know, and practice with examples.\n\nWant to try a quiz on this topic, or would you like to create flashcards from this?`,
+    code: null
+  };
+}
+
+function addMsg(text, role, code=null) {
+  const c = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  let html = `<div class="avatar ${role==='ai'?'ai-av':'user-av'}">${role==='ai'?'⚡':'👤'}</div>
+    <div class="bubble">${text.replace(/\n/g,'<br/>')}`;
+  if(code) html += `<div class="code-block">${code}</div>`;
+  html += `</div>`;
+  div.innerHTML = html;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+let typingEl = null;
+function showTypingIndicator() {
+  const c = document.getElementById('chatMsgs');
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg ai';
+  typingEl.innerHTML = `<div class="avatar ai-av">⚡</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  c.appendChild(typingEl);
+  c.scrollTop = c.scrollHeight;
+}
+function removeTyping() { if(typingEl) { typingEl.remove(); typingEl = null; } }
+
+// ===================== QUIZ DATA =====================
+const QUIZ_DB = {
+  Python: [
+    {q:'What is the output of: print(type([]))',opts:["<class 'list'>","<class 'array'>","<class 'tuple'>","list"],ans:0,exp:"[] is a list literal in Python"},
+    {q:'Which keyword is used to define a function in Python?',opts:['function','def','fun','lambda'],ans:1,exp:"'def' keyword defines functions in Python"},
+    {q:'What does list.append() do?',opts:['Removes last item','Adds item at start','Adds item at end','Sorts the list'],ans:2,exp:"append() adds an element to the end of a list"},
+    {q:'What is a dictionary in Python?',opts:['Ordered list','Key-value pair collection','Set of unique items','Stack data structure'],ans:1,exp:"A dict stores key:value pairs, e.g. {'name': 'John'}"},
+    {q:'What does range(5) return?',opts:['[1,2,3,4,5]','[0,1,2,3,4]','[0,1,2,3,4,5]','range object 1 to 5'],ans:1,exp:"range(5) generates 0,1,2,3,4 — starts from 0"},
+    {q:'What is a lambda in Python?',opts:['A loop','Anonymous function','Import statement','Module'],ans:1,exp:"lambda x: x*2 is a small anonymous function"},
+    {q:"What's the output of: 3 ** 2?",opts:['6','9','8','32'],ans:1,exp:"** is the exponentiation operator: 3^2 = 9"},
+    {q:'How do you open a file in Python?',opts:['open()','file()','read()','load()'],ans:0,exp:"open('filename', 'r') opens a file for reading"},
+    {q:'What is pip?',opts:['Python IDE','Package installer','Python debugger','Compiler'],ans:1,exp:"pip is Python's package installer — pip install requests"},
+    {q:'What does len() do?',opts:['Returns last element','Returns data type','Returns length','Sorts a list'],ans:2,exp:"len('hello') returns 5 — the number of elements"},
+  ],
+  Java: [
+    {q:'What is the parent class of all Java classes?',opts:['Base','Super','Object','Class'],ans:2,exp:"Object is the root class of Java's class hierarchy"},
+    {q:'What does JVM stand for?',opts:['Java Virtual Module','Java Virtual Machine','Java Variable Manager','Joint VM'],ans:1,exp:"JVM (Java Virtual Machine) runs Java bytecode"},
+    {q:'Which access modifier makes a member accessible only within its class?',opts:['public','protected','default','private'],ans:3,exp:"private restricts access to within the same class"},
+    {q:'What is polymorphism?',opts:['Multiple inheritance','Same method, different behavior','Hiding data','Code reuse'],ans:1,exp:"Polymorphism: same interface, different implementations"},
+    {q:'What is an interface in Java?',opts:['A class with body','Abstract class','Contract with abstract methods','Variable type'],ans:2,exp:"Interface defines a contract — implementing classes must provide method bodies"},
+    {q:'What does static mean in Java?',opts:['Object-level member','Class-level member','Final variable','Abstract method'],ans:1,exp:"static members belong to the class, not instances"},
+    {q:'Which Java keyword prevents a class from being subclassed?',opts:['static','abstract','final','private'],ans:2,exp:"final class cannot be extended/subclassed"},
+    {q:'What is a constructor?',opts:['Return type method','Method called on object creation','Abstract method','Static method'],ans:1,exp:"Constructor initializes a new object — same name as class, no return type"},
+    {q:'What does ArrayList store?',opts:['Fixed primitive array','Dynamic resizable objects','Only integers','Key-value pairs'],ans:1,exp:"ArrayList is a dynamic array that can grow/shrink"},
+    {q:'What is an exception in Java?',opts:['Syntax error','Runtime error event','Compile warning','Import error'],ans:1,exp:"Exceptions are events that disrupt normal program flow"},
+  ],
+  'Data Structures': [
+    {q:'What is the time complexity of accessing an element in an array?',opts:['O(n)','O(log n)','O(1)','O(n²)'],ans:2,exp:"Arrays allow O(1) random access by index"},
+    {q:'A stack follows which principle?',opts:['FIFO','LIFO','FILO','LILO'],ans:1,exp:"Stack = Last In, First Out — like a stack of plates"},
+    {q:'A queue follows which principle?',opts:['LIFO','FIFO','LILO','FILO'],ans:1,exp:"Queue = First In, First Out — like a line/queue"},
+    {q:'What is the worst-case search time for a Binary Search Tree?',opts:['O(1)','O(log n)','O(n)','O(n log n)'],ans:2,exp:"Unbalanced BST degrades to O(n) — like a linked list"},
+    {q:'Which data structure uses nodes and pointers?',opts:['Array','Hash Table','Linked List','Stack'],ans:2,exp:"Linked List: each node contains data + pointer to next node"},
+    {q:'What is a hash collision?',opts:['When hash is too large','Two keys map to same index','Hash function fails','Empty hash table'],ans:1,exp:"Collision: two different keys produce the same hash index"},
+    {q:'What traversal visits root first?',opts:['Inorder','Postorder','Preorder','Level order'],ans:2,exp:"Preorder: Root → Left → Right (NLR)"},
+    {q:'What is the space complexity of a hash table with n elements?',opts:['O(1)','O(log n)','O(n)','O(n²)'],ans:2,exp:"Hash table stores n key-value pairs → O(n) space"},
+    {q:'Which data structure is used in BFS?',opts:['Stack','Queue','Heap','Tree'],ans:1,exp:"BFS (Breadth-First Search) uses a Queue"},
+    {q:'Which data structure is used in DFS?',opts:['Queue','Heap','Stack','Array'],ans:2,exp:"DFS (Depth-First Search) uses a Stack (or recursion)"},
+  ],
+  Algorithms: [
+    {q:"What is the time complexity of Binary Search?",opts:['O(n)','O(n²)','O(log n)','O(1)'],ans:2,exp:"Binary Search divides the search space in half each step → O(log n)"},
+    {q:"Which sorting algorithm has worst-case O(n log n)?",opts:['Bubble Sort','Insertion Sort','Merge Sort','Selection Sort'],ans:2,exp:"Merge Sort always runs in O(n log n) — it's a divide and conquer algorithm"},
+    {q:"What is dynamic programming?",opts:['Recursive without memoization','Solving by breaking into subproblems and caching','Always uses recursion','Graph algorithm'],ans:1,exp:"DP = solve subproblems once, store results, reuse them"},
+    {q:"What does a greedy algorithm do?",opts:['Tries all possibilities','Makes locally optimal choice at each step','Uses memoization','Backtracks always'],ans:1,exp:"Greedy: pick best option right now — may not always give global optimum"},
+    {q:"What is the time complexity of Bubble Sort (worst case)?",opts:['O(n)','O(n log n)','O(n²)','O(log n)'],ans:2,exp:"Bubble sort has nested loops → O(n²) worst case"},
+    {q:"What algorithm finds shortest path in a weighted graph?",opts:['BFS','DFS','Dijkstra','Prim'],ans:2,exp:"Dijkstra's algorithm finds shortest paths from a source in weighted graphs"},
+    {q:"What is memoization?",opts:['Clearing cache','Storing results of expensive calls','Sorting memos','Memory optimization'],ans:1,exp:"Memoization = cache function results to avoid recomputation"},
+    {q:"What does O(1) space complexity mean?",opts:['Uses 1 variable','Constant memory regardless of input','Uses 1 array','Uses 1 byte'],ans:1,exp:"O(1) space = algorithm uses a fixed amount of memory"},
+    {q:"Quicksort average case is:",opts:['O(n)','O(n²)','O(n log n)','O(log n)'],ans:2,exp:"Quicksort averages O(n log n) — worst case is O(n²) with bad pivot"},
+    {q:"What is backtracking?",opts:['Undoing last move if stuck','Sorting backwards','Loop with break','Graph search'],ans:0,exp:"Backtracking: try a path, if stuck go back and try another — used in N-Queens, Sudoku"},
+  ],
+  JavaScript: [
+    {q:"What does typeof null return?",opts:["'null'","'undefined'","'object'","'none'"],ans:2,exp:"typeof null === 'object' is a famous JS bug from 1995"},
+    {q:"What is a closure?",opts:['A function with no return','Function that remembers its outer scope','Async function','Arrow function'],ans:1,exp:"Closure: inner function retains access to outer function's variables"},
+    {q:"What does === do in JavaScript?",opts:['Assignment','Loose equality','Strict equality (no coercion)','Not equal'],ans:2,exp:"=== checks value AND type — 5 === '5' is false"},
+    {q:"What is the event loop?",opts:['DOM loop','Mechanism handling async operations','CSS animation loop','Server loop'],ans:1,exp:"Event loop: picks tasks from queue when call stack is empty — enables async JS"},
+    {q:"What does Promise.all() do?",opts:['Runs promises sequentially','Waits for first promise','Waits for all promises','Cancels promises'],ans:2,exp:"Promise.all() resolves when ALL promises resolve, rejects if any rejects"},
+    {q:"What are arrow functions?",opts:['Old function syntax','Compact function syntax without own this','Class methods','Async functions'],ans:1,exp:"Arrow functions: const add = (a,b) => a+b; — no own 'this' binding"},
+    {q:"What is hoisting?",opts:['Raising elements in DOM','Variables/functions moved to top of scope','Import statement','Async pattern'],ans:1,exp:"Hoisting: var declarations and function declarations are moved to top of scope"},
+    {q:"What does JSON.stringify() do?",opts:['Parses JSON string','Converts JS object to JSON string','Formats code','Validates JSON'],ans:1,exp:"JSON.stringify({a:1}) returns '{\"a\":1}'"},
+    {q:"What is the DOM?",opts:['JS engine','Document Object Model — tree of HTML elements','CSS parser','Network API'],ans:1,exp:"DOM: tree representation of HTML that JS can manipulate"},
+    {q:"What does async/await do?",opts:['Creates loops','Makes async code look synchronous','Blocks the thread','Creates threads'],ans:1,exp:"async/await wraps Promises in cleaner syntax — await pauses until Promise resolves"},
+  ],
+  'C++': [
+    {q:'What is a pointer in C++?',opts:['A variable name','Variable storing memory address','Function argument','Array element'],ans:1,exp:"Pointer stores the memory address of another variable — int* ptr = &x;"},
+    {q:'What is the difference between . and -> in C++?',opts:['No difference','-> for pointers, . for objects','-> for methods, . for fields','Both for objects'],ans:1,exp:"Use . for objects/references, -> for pointers to objects"},
+    {q:'What does new keyword do?',opts:['Creates variable','Allocates memory on heap','Imports library','Declares function'],ans:1,exp:"new allocates memory on the heap and returns a pointer"},
+    {q:'What is a destructor?',opts:['Prevents object creation','Called when object is destroyed','Copies object','Base class method'],ans:1,exp:"Destructor (~ClassName) is called when object goes out of scope — for cleanup"},
+    {q:'What is the STL?',opts:['Standard Type Library','Standard Template Library','String Tool Library','System Thread Library'],ans:1,exp:"STL: collection of template classes — vector, map, set, queue, stack, etc."},
+    {q:'What is virtual function?',opts:['Static function','Function that enables runtime polymorphism','Template function','Inline function'],ans:1,exp:"virtual allows derived class to override base class method — runtime polymorphism"},
+    {q:'What is pass by reference?',opts:['Copying value','Passing memory address','Creating new variable','Returning value'],ans:1,exp:"Pass by reference: void f(int &x) — modifying x modifies original"},
+    {q:'What is a template in C++?',opts:['HTML template','Generic programming — works with any type','Pointer type','Preprocessor macro'],ans:1,exp:"Templates enable generic code: template<typename T> T max(T a, T b)"},
+    {q:'What does const mean?',opts:['Constant — value cannot change','Counter variable','Constructor method','Continue keyword'],ans:0,exp:"const int x = 5; — x cannot be reassigned"},
+    {q:'What is the difference between struct and class in C++?',opts:['No difference','struct defaults to public, class to private','struct has no methods','class is faster'],ans:1,exp:"struct members are public by default; class members are private by default"},
+  ],
+  DBMS: [
+    {q:'What does ACID stand for?',opts:['Array, Code, Index, Data','Atomicity, Consistency, Isolation, Durability','Access, Control, Interface, Domain','Auto, Create, Insert, Delete'],ans:1,exp:"ACID = Atomicity, Consistency, Isolation, Durability — properties of DB transactions"},
+    {q:'What is a primary key?',opts:['First column','Unique identifier for each row','Foreign key type','Index type'],ans:1,exp:"Primary key uniquely identifies each record and cannot be NULL"},
+    {q:'What is normalization?',opts:['Sorting data','Removing redundancy by organizing data','Encrypting database','Backing up data'],ans:1,exp:"Normalization reduces data redundancy — 1NF, 2NF, 3NF, BCNF"},
+    {q:'What does SELECT * FROM table do?',opts:['Deletes all rows','Updates all rows','Retrieves all columns from table','Creates a table'],ans:2,exp:"SELECT * retrieves all columns; FROM specifies the table"},
+    {q:'What is a foreign key?',opts:['Key from another database','Column referencing primary key of another table','Encrypted key','Index key'],ans:1,exp:"Foreign key creates a relationship between two tables"},
+    {q:'What is an index in DBMS?',opts:['Table row number','Data structure to speed up queries','Primary key','Column name'],ans:1,exp:"Index speeds up data retrieval — like a book's index"},
+    {q:'What is a JOIN in SQL?',opts:['Merging two databases','Combining rows from two tables','Adding columns','Creating new table'],ans:1,exp:"JOIN combines rows from two or more tables based on a related column"},
+    {q:'What is a transaction?',opts:['A query','Unit of work that must complete fully or not at all','Table creation','Index operation'],ans:1,exp:"Transaction: all operations succeed together or none do — COMMIT or ROLLBACK"},
+    {q:'What is ER Diagram?',opts:['Error Report','Entity-Relationship Diagram showing DB structure','Execution Record','Event Register'],ans:1,exp:"ER Diagram visually represents entities, attributes, and relationships"},
+    {q:'What does GROUP BY do?',opts:['Sorts data','Groups rows with same values for aggregation','Joins tables','Filters rows'],ans:1,exp:"GROUP BY groups rows — used with COUNT, SUM, AVG, etc."},
+  ],
+  Networking: [
+    {q:'What does HTTP stand for?',opts:['HyperText Transfer Protocol','High Transfer Text Protocol','Host Transfer Text Protocol','Hyperlink Transfer Protocol'],ans:0,exp:"HTTP = HyperText Transfer Protocol — the foundation of web data communication"},
+    {q:'What is an IP address?',opts:['Internet Protocol address — unique device identifier','Internet Provider address','Internal Protocol address','Input Port address'],ans:0,exp:"IP address uniquely identifies a device on a network"},
+    {q:'What port does HTTPS use by default?',opts:['80','443','8080','22'],ans:1,exp:"HTTPS uses port 443; HTTP uses port 80"},
+    {q:'What is DNS?',opts:['Domain Name System — translates URLs to IP','Data Network Service','Domain Node Server','Dynamic Network System'],ans:0,exp:"DNS translates domain names like google.com to IP addresses"},
+    {q:'What is TCP?',opts:['Transmission Control Protocol','Transfer Content Protocol','Total Connection Protocol','Text Control Protocol'],ans:0,exp:"TCP: reliable, ordered, connection-based protocol — ensures data delivery"},
+    {q:'What is the OSI model?',opts:['7-layer network model','Operating System Interface','Open Source Interface','Online Service Integration'],ans:0,exp:"OSI has 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application"},
+    {q:'What is a subnet?',opts:['A type of browser','Logical subdivision of a network','Subnetwork protocol','Router type'],ans:1,exp:"Subnet divides a large network into smaller, manageable segments"},
+    {q:'What is a firewall?',opts:['Hardware only','Network security system monitoring traffic','Antivirus program','Router feature only'],ans:1,exp:"Firewall monitors and controls incoming/outgoing network traffic based on rules"},
+    {q:'What does UDP stand for?',opts:['Universal Data Protocol','User Datagram Protocol','Unique Data Path','Unified Device Protocol'],ans:1,exp:"UDP: fast but unreliable — no connection, no guarantee of delivery. Used in streaming, gaming"},
+    {q:'What is latency?',opts:['Data size','Time for data to travel from source to destination','Network speed','Bandwidth'],ans:1,exp:"Latency (ping) = time delay between sending and receiving data, measured in ms"},
+  ],
+  'Operating Systems': [
+    {q:'What is a process?',opts:['A program on disk','A program in execution','A file','A thread'],ans:1,exp:"Process = program in execution with its own memory space and resources"},
+    {q:'What is a thread?',opts:['Separate process','Lightweight unit of execution within a process','Network connection','Memory block'],ans:1,exp:"Thread = smallest unit of execution — shares memory with other threads in same process"},
+    {q:'What is deadlock?',opts:['System crash','Two processes waiting for each other indefinitely','Memory overflow','Disk error'],ans:1,exp:"Deadlock: P1 waits for resource held by P2, P2 waits for resource held by P1 — stuck forever"},
+    {q:'What is virtual memory?',opts:['RAM size','Extension of RAM using disk storage','GPU memory','Cache memory'],ans:1,exp:"Virtual memory uses disk as extended RAM — allows programs larger than physical RAM to run"},
+    {q:'What is CPU scheduling?',opts:['Clock speed','Method of selecting which process runs next','Memory allocation','I/O management'],ans:1,exp:"CPU scheduling: OS decides which process gets CPU time and for how long"},
+    {q:'What is FCFS scheduling?',opts:['First Cache First Served','First Come First Served','Fastest CPU First Scheduled','First Code First Solved'],ans:1,exp:"FCFS: processes are executed in the order they arrive — simple but can cause convoy effect"},
+    {q:'What is a semaphore?',opts:['Signal type','Synchronization tool to prevent race conditions','Memory segment','Network protocol'],ans:1,exp:"Semaphore: counter-based synchronization — controls access to shared resources"},
+    {q:'What is paging?',opts:['Web browsing','Dividing memory into fixed-size pages for management','File system','CPU caching'],ans:1,exp:"Paging divides memory into equal pages — eliminates external fragmentation"},
+    {q:'What is a context switch?',opts:['Changing theme','Saving/loading process state when switching CPU processes','Network switch','File change'],ans:1,exp:"Context switch: save current process state, load next process state — has overhead"},
+    {q:'What is thrashing?',opts:['CPU overload','Excessive paging causing low performance','Memory leak','Disk error'],ans:1,exp:"Thrashing: system spends more time swapping pages than executing — severe performance drop"},
+  ],
+  Mathematics: [
+    {q:'What is the derivative of sin(x)?',opts:['cos(x)','-cos(x)','-sin(x)','tan(x)'],ans:0,exp:"d/dx(sin x) = cos x"},
+    {q:'What is log(1) equal to?',opts:['1','undefined','0','-1'],ans:2,exp:"log(1) = 0 for any base, since b^0 = 1"},
+    {q:'What is the sum of angles in a triangle?',opts:['90°','270°','180°','360°'],ans:2,exp:"Sum of interior angles of any triangle = 180°"},
+    {q:'What is e approximately equal to?',opts:['3.14','1.61','2.71','1.41'],ans:2,exp:"Euler's number e ≈ 2.71828 — base of natural logarithm"},
+    {q:'What is the formula for the area of a circle?',opts:['2πr','πr²','πd','2πr²'],ans:1,exp:"Area = πr² where r is the radius"},
+  ],
+};
+
+// ===================== QUIZ LOGIC =====================
+let activeQuiz = [], curQ = 0, qScore = 0, qAnswered = false;
+
+function startQuiz() {
+  const subj = document.getElementById('qSubj').value;
+  const cnt = parseInt(document.getElementById('qCount').value);
+  const pool = QUIZ_DB[subj] || QUIZ_DB['Python'];
+  activeQuiz = [...pool].sort(()=>Math.random()-0.5).slice(0,Math.min(cnt,pool.length));
+  curQ = 0; qScore = 0; qAnswered = false;
+  document.getElementById('quizSetup').style.display = 'none';
+  document.getElementById('quizActive').style.display = 'flex';
+  document.getElementById('quizResult').style.display = 'none';
+  renderQ();
+}
+
+function renderQ() {
+  const q = activeQuiz[curQ];
+  const subj = document.getElementById('qSubj').value;
+  const diff = document.getElementById('qDiff').value;
+  document.getElementById('qProgressTxt').textContent = `Q ${curQ+1} / ${activeQuiz.length}`;
+  document.getElementById('qProgBar').style.width = (curQ/activeQuiz.length*100)+'%';
+  document.getElementById('qMeta').textContent = `${subj.toUpperCase()} · ${diff.toUpperCase()}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qFeedback').style.display = 'none';
+  document.getElementById('qNextBtn').disabled = true;
+  qAnswered = false;
+  const keys = ['A','B','C','D'];
+  document.getElementById('qOptions').innerHTML = q.opts.map((o,i)=>
+    `<div class="quiz-option" onclick="pickOpt(${i},this)">
+      <div class="opt-key">${keys[i]}</div>${o}
+    </div>`
+  ).join('');
+}
+
+function pickOpt(idx, el) {
+  if(qAnswered) return; qAnswered = true;
+  const q = activeQuiz[curQ];
+  document.querySelectorAll('.quiz-option')[q.ans].classList.add('correct');
+  const fb = document.getElementById('qFeedback');
+  if(idx === q.ans) {
+    qScore++; el.classList.add('correct');
+    fb.style.cssText='display:block;background:rgba(57,255,20,0.08);color:var(--green);border:1px solid rgba(57,255,20,0.2);padding:10px 14px;border-radius:8px;font-size:13px;';
+    fb.textContent = `✅ Correct! ${q.exp}`;
+  } else {
+    el.classList.add('wrong');
+    fb.style.cssText='display:block;background:rgba(255,45,120,0.08);color:var(--pink);border:1px solid rgba(255,45,120,0.2);padding:10px 14px;border-radius:8px;font-size:13px;';
+    fb.textContent = `❌ Wrong. ${q.exp}`;
+    state.mistakes.push({ q: q.q, yourAns: q.opts[idx], correct: q.opts[q.ans], subj: document.getElementById('qSubj').value, time: new Date().toLocaleDateString() });
+    save();
+  }
+  document.getElementById('qScoreTxt').textContent = qScore;
+  document.getElementById('qNextBtn').disabled = false;
+}
+
+function nextQ() {
+  curQ++;
+  if(curQ >= activeQuiz.length) {
+    finishQuiz(); return;
+  }
+  renderQ();
+}
+
+function finishQuiz() {
+  state.quizzesTaken++;
+  const pct = Math.round(qScore/activeQuiz.length*100);
+  state.totalScore += pct;
+  state.scoreHistory = [...state.scoreHistory.slice(1), pct];
+  if(pct === 100) state.unlockedAchievements.includes('perfect') || state.unlockedAchievements.push('perfect');
+  addXP(qScore * 15 + (pct===100?50:0), `Quiz complete! ${pct}%`);
+  document.getElementById('quizActive').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'block';
+  let emoji = pct>=80?'🏆':pct>=60?'👍':'📚';
+  let title = pct>=80?'Excellent!':pct>=60?'Good Job!':'Keep Practicing!';
+  document.getElementById('resEmoji').textContent = emoji;
+  document.getElementById('resTitle').textContent = title;
+  document.getElementById('resScore').textContent = `${qScore}/${activeQuiz.length} correct · ${pct}%`;
+  checkAchievements();
+  save();
+}
+
+function resetQuiz() {
+  document.getElementById('quizSetup').style.display = 'block';
+  document.getElementById('quizActive').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'none';
+}
+
+// ===================== FLASHCARD DATA =====================
+const FC = {
+  Python: [
+    {q:'What is a list comprehension?',a:'A concise way to create lists: [expr for item in iterable if condition]. E.g. [x*2 for x in range(5)] → [0,2,4,6,8]'},
+    {q:'What is the difference between list and tuple?',a:'List is mutable (can change), Tuple is immutable (cannot change). Lists use [], Tuples use ()'},
+    {q:'What is a decorator in Python?',a:'A function that wraps another function to extend behavior. Written with @decorator syntax. E.g. @staticmethod, @property'},
+    {q:'What is __init__?',a:'The constructor method in Python classes. Called automatically when a new object is created. Initializes object attributes.'},
+    {q:'What is *args and **kwargs?',a:'*args: accepts variable positional arguments as tuple. **kwargs: accepts variable keyword arguments as dict.'},
+    {q:'What is a generator?',a:'A function using yield instead of return. Lazily produces values one at a time. Memory efficient for large sequences.'},
+    {q:'What is PEP 8?',a:"Python's style guide for writing clean, readable code. Recommends 4-space indentation, naming conventions, max 79 chars per line."},
+    {q:'What is a virtual environment?',a:'Isolated Python environment for a project. Created with python -m venv. Keeps dependencies separate between projects.'},
+  ],
+  Java: [
+    {q:'What is the difference between == and .equals()?',a:'== compares references (memory address). .equals() compares actual content/value. Always use .equals() for Strings.'},
+    {q:'What is an abstract class?',a:'A class that cannot be instantiated, may have abstract methods. Subclasses must implement abstract methods. Declared with abstract keyword.'},
+    {q:'What is the difference between ArrayList and LinkedList?',a:'ArrayList: fast random access O(1), slow insert/delete O(n). LinkedList: fast insert/delete O(1), slow access O(n).'},
+    {q:'What is try-catch-finally?',a:'Exception handling: try{risky code} catch(Exception e){handle} finally{always runs}. finally executes whether exception occurs or not.'},
+    {q:'What is an iterator?',a:'Interface to traverse a collection. Methods: hasNext() and next(). Used in for-each loops and explicit iteration.'},
+    {q:'What is method overloading vs overriding?',a:'Overloading: same method name, different parameters (compile-time). Overriding: redefine parent method in child class (runtime polymorphism).'},
+    {q:'What is a generic in Java?',a:'Parameterized types: List<String>, Map<K,V>. Enables type-safe code. Compiler checks types at compile time.'},
+    {q:'What is String immutability in Java?',a:"String objects cannot be changed once created. 'str + str2' creates a NEW String. Use StringBuilder for performance."},
+  ],
+  'Data Structures': [
+    {q:'What is time complexity of hash table lookup?',a:'Average case: O(1) — constant time. Worst case: O(n) — when all keys collide. Good hash function is crucial.'},
+    {q:'What is a balanced BST?',a:'BST where height is O(log n). Examples: AVL Tree, Red-Black Tree. Guarantees O(log n) search, insert, delete.'},
+    {q:'Difference between Stack and Queue?',a:'Stack: LIFO — push/pop from same end. Queue: FIFO — enqueue at back, dequeue from front. Stack for DFS, Queue for BFS.'},
+    {q:'What is a heap?',a:'Complete binary tree where parent > children (max-heap) or parent < children (min-heap). Used for Priority Queue. Insert/delete: O(log n).'},
+    {q:'What is a graph?',a:'Collection of vertices (nodes) and edges. Types: directed/undirected, weighted/unweighted. Represented as adjacency list or matrix.'},
+    {q:'What is a trie?',a:'Tree-like data structure for strings. Each node = one character. Used for autocomplete, spell check. Space: O(ALPHABET_SIZE × N × M).'},
+    {q:'What is a deque?',a:'Double-ended queue — insert/delete from both ends. O(1) for all ends. Used for sliding window problems and palindrome checking.'},
+    {q:'What is a priority queue?',a:'Queue where elements have priorities. Highest priority element dequeued first. Usually implemented with a heap. O(log n) operations.'},
+  ],
+  Algorithms: [
+    {q:'What is divide and conquer?',a:'Split problem in half, solve each half recursively, combine results. Examples: Merge Sort, Quick Sort, Binary Search. Often O(n log n).'},
+    {q:'What is dynamic programming?',a:'Solve subproblems once, store results (memoization/tabulation), reuse them. Eliminates redundant computation. E.g. Fibonacci, Knapsack, LCS.'},
+    {q:'What is a greedy algorithm?',a:'Makes locally optimal choice at each step. Fast but not always globally optimal. Works for: Coin change (certain systems), Huffman coding, Kruskal/Prim.'},
+    {q:'What is BFS?',a:'Breadth-First Search: explores level by level using a Queue. Finds shortest path in unweighted graphs. Time: O(V+E).'},
+    {q:'What is DFS?',a:'Depth-First Search: explores as far as possible using a Stack/recursion. Used for: cycle detection, topological sort, connected components. O(V+E).'},
+    {q:"What is Dijkstra's algorithm?",a:"Finds shortest path from source to all vertices in weighted graph. Uses priority queue. Time: O((V+E)log V). Doesn't work with negative weights."},
+    {q:'What is the Knapsack problem?',a:'Given items with weights/values and a capacity, maximize value in knapsack. 0/1 Knapsack: DP solution O(nW). Classic DP interview problem.'},
+    {q:'What is topological sort?',a:'Linear ordering of vertices where edge u→v means u comes before v. Only for DAGs (Directed Acyclic Graphs). Used in build systems, course scheduling.'},
+  ],
+  JavaScript: [
+    {q:'What is a closure?',a:'Inner function that retains access to outer scope after outer function returns. Enables private variables and function factories.'},
+    {q:'What is the event loop?',a:'JS is single-threaded. Event loop checks call stack + callback queue. When stack is empty, processes queued callbacks. Enables async behavior.'},
+    {q:'What is prototypal inheritance?',a:'Objects inherit directly from other objects via prototype chain. obj.__proto__ links to parent. ES6 classes are syntactic sugar over this.'},
+    {q:'What is a Promise?',a:"Object representing future completion/failure of async operation. States: pending, fulfilled, rejected. Use .then().catch() or async/await."},
+    {q:'What is the difference between var, let, const?',a:'var: function-scoped, hoisted. let: block-scoped, not hoisted (TDZ). const: block-scoped, cannot reassign. Use const by default, let when needed.'},
+    {q:'What is destructuring?',a:'Extract values from arrays/objects. const {name, age} = person; or const [a,b] = arr; Cleaner than multiple assignments.'},
+    {q:'What is the spread operator?',a:'... spreads iterable into elements. [...arr1, ...arr2] merges arrays. {...obj1, ...obj2} merges objects. Also used in function arguments.'},
+    {q:'What is a higher-order function?',a:'Function that takes or returns another function. Examples: map, filter, reduce. Enables functional programming patterns.'},
+  ],
+  'C++': [
+    {q:'What is RAII?',a:'Resource Acquisition Is Initialization. Resources acquired in constructor, released in destructor. Prevents memory leaks. unique_ptr uses RAII.'},
+    {q:'What is a smart pointer?',a:'Wrapper around raw pointer that auto-manages memory. unique_ptr (sole ownership), shared_ptr (shared), weak_ptr (non-owning). No manual delete needed.'},
+    {q:'What is move semantics?',a:"Transfer ownership of resources without copying. std::move() converts to rvalue reference. Avoids expensive deep copies. C++11 feature."},
+    {q:'What is a copy constructor?',a:'Special constructor called when copying an object. ClassName(const ClassName& other). Needed for deep copy of pointer members.'},
+    {q:'What is function overloading?',a:'Multiple functions with same name but different parameters. Compiler selects correct version at compile time. void print(int), void print(double).'},
+    {q:'What is const correctness?',a:'Using const to prevent unintended modification. const int x; const methods: void display() const; const parameters: void f(const int& x).'},
+    {q:'What is a namespace?',a:'Prevents naming conflicts. namespace myApp { class Vector{...}; }. Access with myApp::Vector or using namespace myApp.'},
+    {q:'What is a vector in STL?',a:'Dynamic array: auto-resizes. O(1) access, O(1) amortized push_back. Methods: push_back, pop_back, size, at, begin, end, sort.'},
+  ],
+  DBMS: [
+    {q:'What is 1NF (First Normal Form)?',a:'Each column contains atomic (indivisible) values, no repeating groups. Each row is unique. Foundation of normalization.'},
+    {q:'What is 2NF?',a:'Must be in 1NF + every non-key attribute is fully dependent on the entire primary key (no partial dependencies).'},
+    {q:'What is 3NF?',a:'Must be in 2NF + no transitive dependencies (non-key attributes depend only on primary key, not on other non-key attributes).'},
+    {q:'What is an INNER JOIN?',a:'Returns only rows where there is a match in BOTH tables. Rows with no match are excluded. Most common join type.'},
+    {q:'What is a LEFT JOIN?',a:'Returns all rows from left table + matching rows from right. If no match on right, NULLs are returned for right columns.'},
+    {q:'What are aggregate functions?',a:'COUNT(), SUM(), AVG(), MAX(), MIN(). Perform calculations on sets of rows. Used with GROUP BY and HAVING.'},
+    {q:'What is the difference between WHERE and HAVING?',a:'WHERE filters rows BEFORE grouping. HAVING filters groups AFTER GROUP BY. HAVING can use aggregate functions, WHERE cannot.'},
+    {q:'What is a stored procedure?',a:'Pre-compiled SQL code stored in database. Can accept parameters, be reused. Faster than ad-hoc queries. Called with EXEC procedure_name.'},
+  ],
+};
+
+let fcCards = [], fcIdx = 0;
+function loadFlashcards() {
+  const subj = document.getElementById('fcSubject').value;
+  fcCards = [...(FC[subj] || FC['Python'])].sort(()=>Math.random()-0.5);
+  fcIdx = 0;
+  showFC();
+}
+
+function showFC() {
+  if(!fcCards.length) return;
+  const card = fcCards[fcIdx];
+  document.getElementById('fcSubjLabel').textContent = document.getElementById('fcSubject').value.toUpperCase();
+  document.getElementById('fcQ').textContent = card.q;
+  document.getElementById('fcA').textContent = card.a;
+  document.getElementById('fcProgress').textContent = `${fcIdx+1} / ${fcCards.length}`;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
+function nextFC() { if(fcCards.length) { fcIdx = (fcIdx+1)%fcCards.length; showFC(); } }
+function prevFC() { if(fcCards.length) { fcIdx = (fcIdx-1+fcCards.length)%fcCards.length; showFC(); } }
+function markFC(lvl) {
+  state.fcStats[lvl]++;
+  document.getElementById('fcEasy').textContent = state.fcStats.easy;
+  document.getElementById('fcOk').textContent = state.fcStats.ok;
+  document.getElementById('fcHard').textContent = state.fcStats.hard;
+  addXP(3, 'reviewed a flashcard');
+  checkAchievements();
+  nextFC();
+}
+
+// ===================== SUMMARIZER DATA =====================
+const SAMPLES = {
+  python: `Python is a high-level, interpreted programming language known for its simple syntax and readability. Created by Guido van Rossum in 1991, it supports multiple programming paradigms including procedural, object-oriented, and functional programming. Python uses indentation to define code blocks instead of curly braces. It has a massive standard library and package ecosystem through pip. Python is widely used in web development (Django, Flask), data science (NumPy, Pandas), machine learning (TensorFlow, PyTorch), automation, and scripting. Key features include dynamic typing, garbage collection, list comprehensions, generators, decorators, and context managers.`,
+  ds: `Data Structures are specialized formats for organizing, storing, and accessing data efficiently. Arrays provide O(1) random access but fixed size. Linked Lists allow dynamic size with O(1) insert at head but O(n) search. Stacks (LIFO) and Queues (FIFO) are linear structures used in algorithm design. Trees are hierarchical — Binary Search Trees enable O(log n) operations when balanced. Heaps are complete binary trees used for Priority Queues. Hash Tables provide O(1) average lookup using hash functions. Graphs represent relationships between nodes using adjacency lists or matrices. Choosing the right data structure is fundamental to algorithm efficiency.`,
+  networks: `Computer networks enable communication between devices. The OSI Model has 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, and Application. TCP/IP is the internet's core protocol suite. IP addresses uniquely identify devices — IPv4 (32-bit) and IPv6 (128-bit). DNS translates domain names to IPs. HTTP/HTTPS enables web communication (port 80/443). TCP provides reliable, ordered delivery; UDP is fast but unreliable. Routers direct packets between networks. Firewalls monitor traffic based on rules. Latency measures delay; bandwidth measures capacity. TLS/SSL encrypts data in transit for security.`,
+  os: `An Operating System manages hardware and software resources. Key functions include process management, memory management, file systems, and I/O handling. A process is a program in execution with its own memory space. Threads are lighter units within processes. CPU Scheduling algorithms (FCFS, SJF, Round Robin) decide execution order. Virtual Memory uses disk as extended RAM via paging. Deadlock occurs when processes wait for each other indefinitely — prevented by resource ordering. Semaphores and mutexes handle synchronization. The kernel is the OS core running in privileged mode. Modern OS concepts: context switching, system calls, interrupt handling.`
+};
+
+const SUMMARIES = {
+  python: {
+    text: `Python is a high-level, readable programming language created in 1991 that supports multiple paradigms. Its clean syntax, dynamic typing, and massive ecosystem make it the top choice for web development, data science, ML, and automation.`,
+    points: ['Created by Guido van Rossum (1991) — emphasizes readability', 'Interpreted, dynamically typed, garbage collected', 'Multiple paradigms: OOP, functional, procedural', 'Massive ecosystem: Django, Flask, TensorFlow, Pandas, NumPy', 'Key features: list comprehensions, generators, decorators, context managers']
+  },
+  ds: {
+    text: `Data Structures are specialized ways to organize data for efficient access and modification. Choosing the right structure — array, tree, hash table, graph — determines algorithm performance and scalability.`,
+    points: ['Array: O(1) access, fixed size', 'Linked List: O(1) insert at head, O(n) search', 'Stack LIFO / Queue FIFO — used in algorithm design', 'BST: O(log n) balanced operations, O(n) worst case', 'Hash Table: O(1) average lookup via hash functions', 'Graph: nodes + edges — adjacency list/matrix representation']
+  },
+  networks: {
+    text: `Computer networks enable global communication through layered protocols. The OSI 7-layer model and TCP/IP suite govern how data travels from application to physical medium and back.`,
+    points: ['OSI 7 layers: Physical → Application', 'TCP: reliable ordered delivery | UDP: fast, unreliable', 'DNS translates domain names to IP addresses', 'HTTP (port 80) / HTTPS (port 443) for web', 'Firewall controls network traffic by rules', 'TLS/SSL encrypts data in transit']
+  },
+  os: {
+    text: `An OS manages hardware/software resources and provides abstractions for processes, memory, and I/O. Core concepts include scheduling, virtual memory, deadlock prevention, and synchronization.`,
+    points: ['Process = program in execution with its own memory', 'Thread = lightweight unit within a process', 'CPU Scheduling: FCFS, SJF, Round Robin', 'Virtual Memory extends RAM using disk (paging)', 'Deadlock: circular wait — prevented by resource ordering', 'Semaphores/Mutexes for thread synchronization']
+  }
+};
+
+function doSummarize() {
+  const input = document.getElementById('sumInput').value.trim();
+  if(!input) { showToast('⚠️', 'Please enter some notes first!'); return; }
+  document.getElementById('sumOutput').innerHTML = '<span style="color:var(--muted)">⏳ Analyzing...</span>';
+  document.getElementById('sumKeyPoints').style.display = 'none';
+  setTimeout(() => {
+    let result = null;
+    for(const [key, text] of Object.entries(SAMPLES)) {
+      if(input.includes(text.substring(0,30))) { result = SUMMARIES[key]; break; }
+    }
+    if(!result) {
+      const sentences = input.split(/[.!?]+/).filter(s=>s.trim().length>15);
+      result = {
+        text: sentences.slice(0,3).join('. ') + '.',
+        points: ['Main concept identified from your notes', 'Key definitions and terminology noted', 'Applications and use cases identified', 'Review and revise before exams', 'Connect to related topics for deeper understanding']
+      };
+    }
+    document.getElementById('sumOutput').textContent = result.text;
+    const kpList = document.getElementById('sumKPList');
+    kpList.innerHTML = '';
+    result.points.forEach((pt, i) => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;gap:10px;padding:9px 12px;background:rgba(0,229,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;line-height:1.6;animation:fadeUp 0.3s ease;';
+        div.innerHTML = `<span style="color:var(--cyan);font-weight:700;">→</span>${pt}`;
+        kpList.appendChild(div);
+      }, i * 100);
+    });
+    document.getElementById('sumKeyPoints').style.display = 'block';
+    addXP(10, 'summarized notes');
+  }, 1200);
+}
+
+function loadSample(key) { document.getElementById('sumInput').value = SAMPLES[key] || ''; }
+
+// ===================== FORMULA SHEET =====================
+const FORMULAS = {
+  Mathematics: [
+    {name:'Quadratic Formula',eq:'x = (-b ± √(b²-4ac)) / 2a',desc:'Roots of ax² + bx + c = 0'},
+    {name:'Pythagorean Theorem',eq:'a² + b² = c²',desc:'Right triangle: c is hypotenuse'},
+    {name:'Area of Circle',eq:'A = πr²',desc:'r = radius'},
+    {name:'Circumference',eq:'C = 2πr',desc:'r = radius of circle'},
+    {name:"Euler's Formula",eq:'e^(iπ) + 1 = 0',desc:"Most beautiful equation in mathematics"},
+    {name:'Derivative Power Rule',eq:"d/dx(xⁿ) = nxⁿ⁻¹",desc:'Basic differentiation rule'},
+    {name:'Integration Power Rule',eq:'∫xⁿ dx = xⁿ⁺¹/(n+1) + C',desc:'Basic integration rule'},
+    {name:'Logarithm Laws',eq:'log(AB) = log A + log B',desc:'Product rule for logarithms'},
+    {name:'Binomial Theorem',eq:'(a+b)ⁿ = Σ C(n,k) aⁿ⁻ᵏ bᵏ',desc:'Expansion of powers of binomials'},
+  ],
+  Physics: [
+    {name:"Newton's Second Law",eq:'F = ma',desc:'Force = mass × acceleration'},
+    {name:'Kinetic Energy',eq:'KE = ½mv²',desc:'m = mass, v = velocity'},
+    {name:'Potential Energy',eq:'PE = mgh',desc:'m = mass, g = 9.8 m/s², h = height'},
+    {name:'Work Done',eq:'W = Fd·cos(θ)',desc:'F = force, d = displacement, θ = angle'},
+    {name:"Ohm's Law",eq:'V = IR',desc:'Voltage = Current × Resistance'},
+    {name:'Wave Speed',eq:'v = fλ',desc:'v = speed, f = frequency, λ = wavelength'},
+    {name:"Einstein's Mass-Energy",eq:'E = mc²',desc:'c = speed of light (3×10⁸ m/s)'},
+    {name:'Gravitational Force',eq:'F = Gm₁m₂/r²',desc:'G = 6.674×10⁻¹¹ N·m²/kg²'},
+  ],
+  Chemistry: [
+    {name:'Ideal Gas Law',eq:'PV = nRT',desc:'P=pressure, V=volume, n=moles, R=8.314, T=temp(K)'},
+    {name:"Avogadro's Number",eq:'Nₐ = 6.022 × 10²³',desc:'Number of particles in one mole'},
+    {name:'pH Formula',eq:'pH = -log[H⁺]',desc:'[H⁺] = hydrogen ion concentration'},
+    {name:'Molar Mass',eq:'n = mass / molar mass',desc:'n = moles, mass in grams'},
+    {name:'Rate of Reaction',eq:'Rate = k[A]ᵐ[B]ⁿ',desc:'k = rate constant, m,n = orders'},
+    {name:"Faraday's Law",eq:'Q = nF',desc:'Q = charge, n = moles, F = 96485 C/mol'},
+  ],
+  'Data Structures': [
+    {name:'Array Access',eq:'Time: O(1) | Space: O(n)',desc:'Random access by index — fastest lookup'},
+    {name:'Binary Search',eq:'T(n) = T(n/2) + O(1) → O(log n)',desc:'Sorted array — halves search space each step'},
+    {name:'Merge Sort',eq:'T(n) = 2T(n/2) + O(n) → O(n log n)',desc:'Divide and conquer — always O(n log n)'},
+    {name:'Quick Sort Average',eq:'T(n) = O(n log n)',desc:'Pivot-based — worst case O(n²) with bad pivot'},
+    {name:'Hash Table',eq:'Average: O(1) | Worst: O(n)',desc:'Depends on hash function quality and load factor'},
+    {name:'BST Operations',eq:'O(log n) balanced, O(n) skewed',desc:'Insert, Search, Delete — depends on tree height'},
+    {name:'Heap Operations',eq:'Insert: O(log n) | GetMax: O(1)',desc:'Complete binary tree — used for Priority Queue'},
+    {name:'BFS / DFS',eq:'Time: O(V+E) | Space: O(V)',desc:'V = vertices, E = edges in the graph'},
+  ],
+  Algorithms: [
+    {name:'Fibonacci (DP)',eq:'F(n) = F(n-1) + F(n-2)',desc:'DP: O(n) time and O(n) space vs O(2ⁿ) naive'},
+    {name:'Bubble Sort',eq:'Best: O(n) | Avg/Worst: O(n²)',desc:'Best case when already sorted'},
+    {name:'Selection Sort',eq:'Always: O(n²)',desc:'Always n² comparisons regardless of input'},
+    {name:'Insertion Sort',eq:'Best: O(n) | Worst: O(n²)',desc:'Efficient for small or nearly-sorted data'},
+    {name:'Counting Sort',eq:'O(n+k) | k = range of input',desc:'Only for integers in known range — non-comparison'},
+    {name:'Radix Sort',eq:'O(d × (n+k))',desc:'d = digits, k = base — linear for fixed digit numbers'},
+    {name:'Master Theorem',eq:'T(n)=aT(n/b)+f(n)',desc:'Solves divide-and-conquer recurrences'},
+  ],
+};
+
+let allFormulas = [], curFormulas = [];
+function loadFormulas() {
+  const subj = document.getElementById('formulaSubj').value;
+  allFormulas = FORMULAS[subj] || [];
+  curFormulas = allFormulas;
+  renderFormulas(curFormulas);
+}
+
+function filterFormulas() {
+  const q = document.getElementById('formulaSearch').value.toLowerCase();
+  curFormulas = allFormulas.filter(f => f.name.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q));
+  renderFormulas(curFormulas);
+}
+
+function renderFormulas(list) {
+  document.getElementById('formulaGrid').innerHTML = list.map(f => `
+    <div class="formula-card">
+      <div class="formula-name">${f.name}</div>
+      <div class="formula-eq">${f.eq}</div>
+      <div class="formula-desc">${f.desc}</div>
+    </div>`).join('');
+}
+
+function printFormulas() { window.print(); }
+
+// ===================== STUDY PLAN =====================
+const PLAN_TASKS = {
+  Python:['Review syntax and data types','Practice list/dict operations','Write functions with decorators','Practice OOP — classes and inheritance','Work on a mini project'],
+  Java:['Review OOP concepts','Practice collections framework','Work on exception handling','Build a simple CRUD app','Practice design patterns'],
+  DSA:['Solve 3 array problems','Practice linked list operations','Implement a BST','Solve graph problems (BFS/DFS)','Practice dynamic programming'],
+  Math:['Review formulas','Solve 10 practice problems','Practice integration/derivation','Work on past exam questions','Revise proofs'],
+  Physics:['Read chapter summary','Derive key equations','Solve numerical problems','Review diagrams','Practice MCQs'],
+  default:['Review notes','Practice problems','Solve past questions','Revise key points','Self-test']
+};
+const COLORS = ['var(--cyan)','var(--purple)','var(--pink)','var(--yellow)','var(--orange)','var(--green)'];
+const TIMES = ['8:00 AM','9:30 AM','11:00 AM','2:00 PM','4:00 PM','6:00 PM'];
+
+function genPlan() {
+  const name = document.getElementById('spName').value || 'Student';
+  const exam = document.getElementById('spExam').value || 'Exams';
+  const subjects = document.getElementById('spSubjects').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const weak = document.getElementById('spWeak').value;
+  const hours = document.getElementById('spHours').value;
+  const days = parseInt(document.getElementById('spDays').value);
+  const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+  let html = `<div class="card" style="border-left:3px solid var(--orange)">
+    <div style="font-family:var(--mono);font-size:16px;font-weight:700">📅 ${name}'s Plan — ${exam}</div>
+    <div style="color:var(--muted2);font-size:12px;margin-top:4px">${hours}/day · ${days} days${weak?' · Focus: '+weak:''}</div>
+  </div>`;
+
+  const tasks = [];
+  for(let d=1; d<=Math.min(days,7); d++) {
+    const subj = subjects[(d-1) % subjects.length] || 'General';
+    const taskList = PLAN_TASKS[subj] || PLAN_TASKS.default;
+    const color = COLORS[(d-1)%COLORS.length];
+    const dayName = dayNames[(d-1)%7];
+
+    let tRows = taskList.slice(0,4).map((t,i) => {
+      const id = `pt_${d}_${i}`;
+      tasks.push({id, text: t, subj});
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+        <div id="${id}" onclick="togglePT('${id}')" style="width:18px;height:18px;border:2px solid var(--border2);border-radius:5px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s;"></div>
+        <span>${t} <span style="color:var(--muted2);">(${subj})</span></span>
+        <span style="color:var(--orange);font-size:11px;font-weight:600;margin-left:auto;">${TIMES[i]}</span>
+      </div>`;
+    }).join('');
+
+    if(weak) tRows += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:12px;">
+      <div id="pt_${d}_w" onclick="togglePT('pt_${d}_w')" style="width:18px;height:18px;border:2px solid var(--pink);border-radius:5px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s;"></div>
+      <span>⚡ Extra: ${weak} <span style="color:var(--pink);font-size:11px;font-weight:600;">[Weak Area]</span></span>
+      <span style="color:var(--orange);font-size:11px;font-weight:600;margin-left:auto;">7:00 PM</span>
+    </div>`;
+
+    html += `<div class="card" style="border-left:3px solid ${color}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div><div style="font-family:var(--mono);font-weight:700">Day ${d} — ${dayName}</div><div style="font-size:11px;color:var(--muted2)">${subj} · ${hours}</div></div>
+        <span style="font-size:11px;padding:3px 10px;border-radius:10px;background:rgba(255,255,255,0.05);color:${color}">${d}/${days}</span>
+      </div>
+      ${tRows}
+    </div>`;
+  }
+
+  state.planTasks = tasks;
+  document.getElementById('planOut').innerHTML = html;
+  document.getElementById('todayTasks').innerHTML = tasks.slice(0,4).map(t =>
+    `<div id="tt_${t.id}" style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <div onclick="toggleTT('tt_${t.id}')" style="width:16px;height:16px;border:2px solid var(--border2);border-radius:4px;cursor:pointer;flex-shrink:0;"></div>
+      ${t.text}
+    </div>`).join('');
+  addXP(20, 'created study plan');
+  save();
+}
+
+function togglePT(id) {
+  const el = document.getElementById(id); if(!el) return;
+  const done = el.style.background === 'var(--green)';
+  el.style.background = done ? '' : 'var(--green)';
+  el.style.borderColor = done ? 'var(--border2)' : 'var(--green)';
+  el.textContent = done ? '' : '✓';
+}
+function toggleTT(id) {
+  const el = document.getElementById(id); if(!el) return;
+  const box = el.querySelector('div');
+  if(!box) return;
+  const done = box.style.background === 'var(--green)';
+  box.style.background = done ? '' : 'var(--green)';
+  box.style.borderColor = done ? 'var(--border2)' : 'var(--green)';
+  box.textContent = done ? '' : '✓';
+}
+
+// ===================== POMODORO =====================
+let pomoTimer = null, pomoRunning = false, pomoSeconds = 25*60, pomoMode = 'work', pomoSession = 0;
+
+function getPomoSettings() {
+  return {
+    focus: parseInt(document.getElementById('pomoFocus').value) * 60,
+    shortBreak: parseInt(document.getElementById('pomoBreak').value) * 60,
+    longBreak: parseInt(document.getElementById('pomoLong').value) * 60,
+  };
+}
+
+function togglePomo() {
+  if(pomoRunning) {
+    clearInterval(pomoTimer);
+    pomoRunning = false;
+    document.getElementById('pomoBtn').textContent = '▶ Resume';
+  } else {
+    pomoRunning = true;
+    document.getElementById('pomoBtn').textContent = '⏸ Pause';
+    pomoTimer = setInterval(() => {
+      pomoSeconds--;
+      updatePomoDisplay();
+      if(pomoSeconds <= 0) completePomo();
+    }, 1000);
+  }
+}
+
+function updatePomoDisplay() {
+  const m = Math.floor(pomoSeconds/60).toString().padStart(2,'0');
+  const s = (pomoSeconds%60).toString().padStart(2,'0');
+  document.getElementById('pomoTime').textContent = `${m}:${s}`;
+}
+
+function completePomo() {
+  clearInterval(pomoTimer); pomoRunning = false;
+  if(pomoMode === 'work') {
+    state.pomodorosDone++;
+    pomoSession++;
+    addXP(25, 'completed a Pomodoro!');
+    const log = document.getElementById('pomoLog');
+    const entry = document.createElement('div');
+    entry.style.cssText='font-size:11px;color:var(--muted2);padding:4px 0;border-bottom:1px solid var(--border);';
+    entry.textContent = `✅ Focus session #${state.pomodorosDone} — ${new Date().toLocaleTimeString()}`;
+    log.insertBefore(entry, log.firstChild);
+    if(log.children.length > 1 && log.children[log.children.length-1].textContent.includes('No sessions')) log.removeChild(log.lastChild);
+    document.getElementById('pomoCount').textContent = state.pomodorosDone;
+    checkAchievements();
+    pomoMode = (pomoSession % 4 === 0) ? 'longBreak' : 'break';
+    showToast('🍅', `Pomodoro done! Time for a ${pomoMode==='longBreak'?'long break':'break'}!`);
+  } else {
+    pomoMode = 'work';
+    showToast('💪', 'Break over! Back to work!');
+  }
+  renderPomoDots();
+  resetPomo();
+  save();
+}
+
+function resetPomo() {
+  clearInterval(pomoTimer); pomoRunning = false;
+  const s = getPomoSettings();
+  pomoSeconds = pomoMode==='work' ? s.focus : pomoMode==='break' ? s.shortBreak : s.longBreak;
+  const circle = document.getElementById('pomoCircle');
+  circle.className = 'pomo-circle ' + (pomoMode==='work'?'work':'break');
+  document.getElementById('pomoLabel').textContent = pomoMode==='work' ? 'FOCUS' : pomoMode==='break' ? 'SHORT BREAK' : 'LONG BREAK';
+  document.getElementById('pomoBtn').textContent = '▶ Start';
+  document.getElementById('pomoBtn').className = pomoMode==='work' ? 'btn btn-green' : 'btn btn-cyan';
+  updatePomoDisplay();
+}
+
+function skipPomo() { completePomo(); }
+
+function renderPomoDots() {
+  document.getElementById('pomoDots').innerHTML = Array.from({length:4}, (_,i) =>
+    `<div class="pomo-dot ${i < (pomoSession%4 || (pomoSession>0 && pomoSession%4===0 ? 4:0)) ? 'done':''}"></div>`
+  ).join('');
+}
+
+// ===================== HABITS =====================
+const HABIT_COLORS = { cyan:'var(--cyan)', green:'var(--green)', pink:'var(--pink)', yellow:'var(--yellow)', purple:'var(--purple)', orange:'var(--orange)' };
+
+function addHabit() {
+  const name = document.getElementById('habitName').value.trim();
+  const color = document.getElementById('habitColor').value;
+  if(!name) { showToast('⚠️', 'Enter a habit name first!'); return; }
+  state.habits.push({ id: Date.now(), name, color, days: {}, streakCount: 0 });
+  document.getElementById('habitName').value = '';
+  checkAchievements(); renderHabits(); addXP(5, 'added a habit'); save();
+}
+
+function addPresetHabit(name, color) {
+  if(state.habits.find(h=>h.name===name)) { showToast('ℹ️', 'Already added!'); return; }
+  state.habits.push({ id: Date.now(), name, color, days: {}, streakCount: 0 });
+  checkAchievements(); renderHabits(); addXP(5, 'added a habit'); save();
+}
+
+function renderHabits() {
+  const today = new Date();
+  const dayAbbr = ['S','M','T','W','T','F','S'];
+  const todayIdx = today.getDay();
+
+  // headers
+  const headers = document.getElementById('habitDayHeaders');
+  headers.innerHTML = dayAbbr.map((d,i) =>
+    `<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i===todayIdx?'var(--cyan)':'var(--muted)'};">${d}</div>`
+  ).join('');
+
+  // week label
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+  document.getElementById('habitWeekLabel').textContent = startOfWeek.toLocaleDateString('en',{month:'short',day:'numeric'}) + ' — ' + new Date(startOfWeek.getTime()+6*86400000).toLocaleDateString('en',{month:'short',day:'numeric'});
+
+  if(!state.habits.length) {
+    document.getElementById('habitList').innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Add habits above to start tracking!</div>`;
+    return;
+  }
+
+  const weekKey = startOfWeek.toISOString().split('T')[0];
+  document.getElementById('habitList').innerHTML = state.habits.map(h => {
+    const dotDays = dayAbbr.map((_,i) => {
+      const dayKey = `${weekKey}_${i}`;
+      const done = h.days[dayKey];
+      const isToday = i === todayIdx;
+      return `<div class="habit-day ${done?'done':''} ${isToday&&!done?'today':''}" onclick="toggleHabitDay(${h.id}, '${dayKey}')">${done?'✓':''}</div>`;
+    }).join('');
+
+    const streak = getHabitStreak(h, weekKey, todayIdx);
+    return `<div class="habit-row">
+      <div class="habit-name" style="color:${HABIT_COLORS[h.color]||'var(--cyan)'}">${h.name}</div>
+      <div class="habit-days">${dotDays}</div>
+      <div class="habit-streak">🔥${streak}</div>
+      <button class="habit-del" onclick="deleteHabit(${h.id})">✕</button>
+    </div>`;
+  }).join('');
+
+  updateHabitStats(weekKey, todayIdx);
+}
+
+function getHabitStreak(h, weekKey, todayIdx) {
+  let streak = 0;
+  for(let i = todayIdx; i >= 0; i--) {
+    if(h.days[`${weekKey}_${i}`]) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function toggleHabitDay(id, dayKey) {
+  const h = state.habits.find(h=>h.id===id); if(!h) return;
+  h.days[dayKey] = !h.days[dayKey];
+  if(h.days[dayKey]) { addXP(10, 'completed a habit!'); showToast('✅', `${h.name} — checked in!`); }
+  renderHabits(); checkAchievements(); save();
+}
+
+function deleteHabit(id) {
+  state.habits = state.habits.filter(h=>h.id!==id);
+  renderHabits(); save();
+}
+
+function updateHabitStats(weekKey, todayIdx) {
+  const allStreaks = state.habits.map(h => getHabitStreak(h, weekKey, todayIdx));
+  const best = allStreaks.length ? Math.max(...allStreaks) : 0;
+  const todayDone = state.habits.filter(h => h.days[`${weekKey}_${todayIdx}`]).length;
+  const total = Object.values(state.habits.reduce((acc,h) => {
+    Object.keys(h.days).forEach(k => { if(h.days[k]) acc[k] = true; }); return acc;
+  }, {})).length;
+
+  document.getElementById('bestStreak').textContent = best;
+  document.getElementById('todayDone').textContent = `${todayDone}/${state.habits.length}`;
+  document.getElementById('totalCheckins').textContent = total;
+
+  const habitDone = state.habits.length ? Math.round(todayDone/state.habits.length*100) : 0;
+  document.getElementById('statHabits').textContent = habitDone + '%';
+}
+
+// ===================== MISTAKE TRACKER =====================
+function renderMistakes() {
+  const list = document.getElementById('mistakeList');
+  document.getElementById('mistakeCount').textContent = state.mistakes.length;
+  if(!state.mistakes.length) {
+    list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No mistakes logged yet. Take a quiz to start!</div>`;
+    return;
+  }
+  list.innerHTML = [...state.mistakes].reverse().map((m,i) => `
+    <div class="mistake-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="mistake-q">${m.q}</div>
+        <span style="font-size:10px;color:var(--muted2);flex-shrink:0;margin-left:12px;">${m.subj} · ${m.time}</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:12px;">
+        <div>Your answer: <span style="color:var(--pink)">${m.yourAns}</span></div>
+        <div>Correct: <span style="color:var(--green)">${m.correct}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function clearMistakes() {
+  state.mistakes = []; renderMistakes(); save();
+  showToast('🗑️', 'Mistake log cleared!');
+}
+
+function retryMistakes() {
+  if(!state.mistakes.length) { showToast('ℹ️', 'No mistakes to retry!'); return; }
+  const modal = document.getElementById('retryModal');
+  const unique = state.mistakes.filter((m,i,a) => a.findIndex(x=>x.q===m.q) === i).slice(0,5);
+  let idx = 0;
+
+  function show(i) {
+    if(i >= unique.length) {
+      document.getElementById('retryContent').innerHTML = `<div style="text-align:center;padding:20px;"><div style="font-size:40px;margin-bottom:12px">🎉</div><div style="font-family:var(--mono);font-size:18px;font-weight:700">Review Complete!</div><button class="btn btn-purple" style="margin-top:20px" onclick="closeModal()">Done</button></div>`;
+      return;
+    }
+    const m = unique[i];
+    document.getElementById('retryContent').innerHTML = `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-family:var(--mono)">Q ${i+1}/${unique.length}</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:14px">${m.q}</div>
+        <div style="padding:10px 14px;background:rgba(255,45,120,0.08);border:1px solid rgba(255,45,120,0.2);border-radius:8px;font-size:13px;margin-bottom:10px;">❌ You answered: <strong>${m.yourAns}</strong></div>
+        <div style="padding:10px 14px;background:rgba(57,255,20,0.08);border:1px solid rgba(57,255,20,0.2);border-radius:8px;font-size:13px;margin-bottom:16px;">✅ Correct answer: <strong>${m.correct}</strong></div>
+      </div>
+      <button class="btn btn-purple" onclick="(${show.toString()})(${i+1})">Next →</button>`;
+  }
+  show(0);
+  modal.classList.add('open');
+}
+
+function closeModal() { document.getElementById('retryModal').classList.remove('open'); }
+
+// ===================== INIT =====================
+
+// ===== NEW FEATURES JS =====
+
+// PAGE META for new tabs
+const newPageMeta = {
+  battle: ['⚔️ Battle Mode', '60-second speed quiz — answer as many as you can!'],
+  exam: ['📋 Exam Simulator', 'Full timed mock exam — no going back'],
+  mindmap: ['🗺️ Mind Map', 'Visual concept maps for any topic'],
+  code: ['💻 Code Playground', 'Write & simulate code in browser'],
+  notes: ['📝 Notes', 'Save and organize your study notes'],
+  vocab: ['📖 Vocabulary', 'CS terms, definitions and examples'],
+  interview: ['🎙️ Interview Prep', 'CS interview questions and model answers'],
+  heatmap: ['🗓️ Study Heatmap', 'GitHub-style 90-day activity tracker'],
+  weakness: ['📉 Weakness Analyzer', 'Know where to focus based on your mistakes'],
+  shop: ['🛒 Coin Shop', 'Spend coins earned from studying'],
+};
+
+// Patch switchTab to handle new tabs
+const _origST = typeof switchTab === 'function' ? switchTab : null;
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + id);
+  if (tabEl) { tabEl.classList.add('active'); tabEl.style.display = 'flex'; }
+  if (btn) btn.classList.add('active');
+  const meta = newPageMeta[id];
+  if (meta) {
+    document.getElementById('pageTitle').textContent = meta[0];
+    document.getElementById('pageSubtitle').textContent = meta[1];
+  }
+  if (id === 'battle') document.getElementById('battleBest').textContent = (state.battleBest || 0);
+  if (id === 'heatmap') renderHeatmap();
+  if (id === 'weakness') renderWeakness();
+  if (id === 'vocab') loadVocab();
+  if (id === 'notes') renderNotes();
+  if (id === 'shop') renderShop();
+  if (id === 'interview') loadInterview();
+  if (id === 'code') loadCodeTemplate();
+  if (id === 'mindmap') setTimeout(() => { if (document.getElementById('mmTopic').value) genMindMap(); }, 100);
+  // also call originals for existing tabs
+  if (['dashboard','chat','quiz','flashcards','summarizer','formulas','studyplan','pomodoro','habits','mistakes','achievements'].includes(id)) {
+    if (id === 'dashboard') refreshDashboard();
+    if (id === 'achievements') renderAchievements();
+    if (id === 'flashcards') loadFlashcards();
+    if (id === 'formulas') loadFormulas();
+    if (id === 'habits') renderHabits();
+    if (id === 'mistakes') renderMistakes();
+  }
+}
+
+// ===== BATTLE MODE =====
+let bTimer = null, bSecs = 60, bQList = [], bCurQ = 0, bScore = 0, bCorrect = 0, bWrong = 0, bAnswered = false;
+function getAllQs() {
+  const all = [];
+  Object.entries(quizBank).forEach(([s, qs]) => qs.forEach(q => all.push({ ...q, subj: s })));
+  return all.sort(() => Math.random() - .5);
+}
+function startBattle() {
+  const s = document.getElementById('battleSubj').value;
+  bQList = s === 'All Subjects' ? getAllQs() : ([...(quizBank[s] || quizBank['Science'])]).sort(() => Math.random() - .5);
+  bCurQ = 0; bScore = 0; bCorrect = 0; bWrong = 0; bSecs = 60; bAnswered = false;
+  document.getElementById('battleSetup').style.display = 'none';
+  document.getElementById('battleActive').style.display = 'flex';
+  document.getElementById('battleResult').style.display = 'none';
+  renderBQ(); 
+  bTimer = setInterval(() => {
+    bSecs--;
+    const el = document.getElementById('battleTimer');
+    el.textContent = bSecs;
+    document.getElementById('battleBar').style.width = (bSecs / 60 * 100) + '%';
+    el.style.color = bSecs <= 10 ? 'var(--accent3)' : bSecs <= 20 ? 'var(--yellow)' : 'var(--green)';
+    if (bSecs <= 0) { clearInterval(bTimer); endBattle(); }
+  }, 1000);
+}
+function renderBQ() {
+  if (bCurQ >= bQList.length) bCurQ = 0;
+  const q = bQList[bCurQ]; bAnswered = false;
+  document.getElementById('battleQ').textContent = q.q;
+  const keys = ['A','B','C','D'];
+  document.getElementById('battleOpts').innerHTML = q.options.map((o, i) =>
+    `<div class="battle-option" onclick="answerBattle(${i},this)">${o}</div>`
+  ).join('');
+}
+function answerBattle(idx, el) {
+  if (bAnswered) return; bAnswered = true;
+  const q = bQList[bCurQ];
+  const opts = document.querySelectorAll('.battle-option');
+  if (idx === q.answer) {
+    bScore += 10; bCorrect++;
+    el.classList.add('flash-c');
+    setTimeout(() => { el.classList.remove('flash-c'); bCurQ++; renderBQ(); }, 280);
+  } else {
+    bWrong++;
+    el.classList.add('flash-w');
+    if (opts[q.answer]) opts[q.answer].classList.add('flash-c');
+    setTimeout(() => { bCurQ++; renderBQ(); }, 450);
+  }
+  document.getElementById('battleScore').textContent = bScore;
+  document.getElementById('battleCorrect').textContent = bCorrect;
+  document.getElementById('battleWrong').textContent = bWrong;
+  document.getElementById('battleTotal').textContent = bCorrect + bWrong;
+}
+function endBattle() {
+  document.getElementById('battleActive').style.display = 'none';
+  document.getElementById('battleResult').style.display = 'block';
+  const isNew = bScore > (state.battleBest || 0);
+  if (isNew) state.battleBest = bScore;
+  document.getElementById('battleResE').textContent = bScore >= 100 ? '🏆' : bScore >= 50 ? '⚔️' : '💪';
+  document.getElementById('battleResT').textContent = "Time's Up!";
+  document.getElementById('battleResS').textContent = `Score: ${bScore} pts · ${bCorrect} correct · ${bWrong} wrong`;
+  document.getElementById('battleNewBest').style.display = isNew ? 'block' : 'none';
+  addXP(bScore, 'Battle Mode!');
+  if (typeof checkAchievements === 'function') checkAchievements();
+  if (typeof save === 'function') save();
+}
+function resetBattle() {
+  clearInterval(bTimer);
+  document.getElementById('battleSetup').style.display = 'block';
+  document.getElementById('battleActive').style.display = 'none';
+  document.getElementById('battleResult').style.display = 'none';
+  document.getElementById('battleBest').textContent = (state.battleBest || 0);
+}
+
+// ===== EXAM SIMULATOR =====
+let examQs = [], examAns = {}, examCurQ = 0, examTimerI = null, examSecs = 600;
+function startExam() {
+  const s = document.getElementById('examSubj').value;
+  const cnt = parseInt(document.getElementById('examQCount').value);
+  const pool = quizBank[s] || quizBank['Python'] || Object.values(quizBank)[0];
+  examQs = [...pool].sort(() => Math.random() - .5).slice(0, Math.min(cnt, pool.length));
+  examAns = {}; examCurQ = 0;
+  examSecs = parseInt(document.getElementById('examDur').value) * 60;
+  document.getElementById('examSetup').style.display = 'none';
+  document.getElementById('examActive').style.display = 'flex';
+  document.getElementById('examResult').style.display = 'none';
+  renderExQ(); renderExNav();
+  examTimerI = setInterval(() => {
+    examSecs--;
+    const m = String(Math.floor(examSecs / 60)).padStart(2, '0');
+    const s2 = String(examSecs % 60).padStart(2, '0');
+    const el = document.getElementById('examTimer');
+    el.textContent = m + ':' + s2;
+    el.style.color = examSecs < 60 ? 'var(--accent3)' : 'var(--yellow)';
+    if (examSecs <= 0) { clearInterval(examTimerI); submitExam(); }
+  }, 1000);
+}
+function renderExQ() {
+  const q = examQs[examCurQ];
+  document.getElementById('examMeta').textContent = 'Q' + (examCurQ + 1) + ' of ' + examQs.length;
+  document.getElementById('examQNum').textContent = (examCurQ + 1) + '/' + examQs.length;
+  document.getElementById('examQText').textContent = q.q;
+  const keys = ['A','B','C','D'];
+  document.getElementById('examOpts').innerHTML = q.options.map((o, i) =>
+    `<div class="option ${examAns[examCurQ] === i ? 'selected' : ''}" onclick="selectExAns(${i},this)">`
+    + `<div class="option-key">${keys[i]}</div>${o}</div>`
+  ).join('');
+  document.getElementById('examAnswered').textContent = Object.keys(examAns).length;
+  renderExNav();
+}
+function selectExAns(idx) {
+  examAns[examCurQ] = idx;
+  document.getElementById('examAnswered').textContent = Object.keys(examAns).length;
+  renderExQ();
+}
+function examNext() { if (examCurQ < examQs.length - 1) { examCurQ++; renderExQ(); } }
+function examPrev() { if (examCurQ > 0) { examCurQ--; renderExQ(); } }
+function renderExNav() {
+  document.getElementById('examQNav').innerHTML = examQs.map((_, i) =>
+    `<div class="exam-q-dot ${examAns[i] !== undefined ? 'answered' : ''} ${i === examCurQ ? 'cur' : ''}" onclick="examGoto(${i})">${i + 1}</div>`
+  ).join('');
+}
+function examGoto(i) { examCurQ = i; renderExQ(); }
+function submitExam() {
+  clearInterval(examTimerI);
+  let correct = 0;
+  examQs.forEach((q, i) => { if (examAns[i] === q.answer) correct++; });
+  const pct = Math.round(correct / examQs.length * 100);
+  document.getElementById('examActive').style.display = 'none';
+  document.getElementById('examResult').style.display = 'flex';
+  document.getElementById('examResE').textContent = pct >= 80 ? '🏆' : pct >= 60 ? '📋' : '📚';
+  document.getElementById('examResT').textContent = pct >= 80 ? 'Passed! ✅' : pct >= 60 ? 'Almost There' : 'Keep Studying';
+  document.getElementById('examResS').textContent = `${correct}/${examQs.length} correct · ${pct}% · ${pct >= 60 ? 'PASS' : 'FAIL'}`;
+  document.getElementById('examReviewList').innerHTML = examQs.map((q, i) => {
+    const ua = examAns[i]; const ok = ua === q.answer;
+    return `<div style="padding:9px;background:var(--surface2);border-radius:8px;border-left:3px solid ${ok ? 'var(--green)' : 'var(--accent3)'}">
+      <div style="font-size:12px;font-weight:600;margin-bottom:3px">Q${i+1}: ${q.q}</div>
+      <div style="font-size:11px;color:${ok ? 'var(--green)' : 'var(--accent3)'}">
+        ${ok ? '✅ Correct' : `❌ Wrong — Correct: ${q.options[q.answer]}`}
+      </div></div>`;
+  }).join('');
+  addXP(pct, 'Exam complete!');
+}
+function resetExam() {
+  clearInterval(examTimerI);
+  document.getElementById('examSetup').style.display = 'block';
+  document.getElementById('examActive').style.display = 'none';
+  document.getElementById('examResult').style.display = 'none';
+}
+
+// ===== MIND MAP =====
+const MM = {
+  'Python': { c: ['Syntax','Data Types','OOP','Libraries','Web Dev'], sub: { 'Syntax':['Indentation','f-strings','Decorators'], 'Data Types':['List','Dict','Tuple','Set'], 'OOP':['Class','Inheritance','Polymorphism'], 'Libraries':['NumPy','Pandas','Flask'], 'Web Dev':['Django','FastAPI','Flask'] } },
+  'Data Structures': { c: ['Arrays','Linked Lists','Trees','Graphs','Hash Tables'], sub: { 'Arrays':['Static','Dynamic','2D'], 'Linked Lists':['Singly','Doubly','Circular'], 'Trees':['BST','AVL','Heap','Trie'], 'Graphs':['BFS','DFS','Weighted'], 'Hash Tables':['Hashing','Collision','Load'] } },
+  'OOP': { c: ['Encapsulation','Inheritance','Polymorphism','Abstraction'], sub: { 'Encapsulation':['Private','Getters','Setters'], 'Inheritance':['Single','Multiple','Multilevel'], 'Polymorphism':['Overloading','Overriding'], 'Abstraction':['Abstract Class','Interface'] } },
+  'Operating System': { c: ['Processes','Memory','Scheduling','File System','Security'], sub: { 'Processes':['PCB','Threads','IPC'], 'Memory':['Paging','Segmentation','Virtual'], 'Scheduling':['FCFS','SJF','Round Robin'], 'File System':['FAT','NTFS','ext4'] } },
+  'Machine Learning': { c: ['Supervised','Unsupervised','Deep Learning','Libraries','Evaluation'], sub: { 'Supervised':['Regression','Classification','SVM'], 'Unsupervised':['K-Means','PCA'], 'Deep Learning':['CNN','RNN','Transformers'], 'Libraries':['TF','PyTorch','sklearn'] } },
+};
+function genMindMap() {
+  const topic = document.getElementById('mmTopic').value.trim() || 'Python';
+  const canvas = document.getElementById('mindmapCanvas');
+  canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const data = MM[topic] || { c: ['Concept','Theory','Practice','Examples'], sub: {} };
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0e1219'; ctx.fillRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2;
+  const cols = ['#00e5ff','#39ff14','#ff2d78','#ffd600','#b44dff','#ff6b35'];
+  // center node
+  ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,229,255,0.15)'; ctx.fill();
+  ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 13px Outfit,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  topic.split(' ').forEach((w, i, a) => ctx.fillText(w, cx, cy + (i - (a.length-1)/2) * 15));
+  data.c.forEach((branch, bi) => {
+    const angle = (bi / data.c.length) * Math.PI * 2 - Math.PI / 2;
+    const bx = cx + Math.cos(angle) * 155, by = cy + Math.sin(angle) * 120;
+    const col = cols[bi % cols.length];
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by);
+    ctx.strokeStyle = col + '80'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(bx, by, 36, 0, Math.PI * 2);
+    ctx.fillStyle = col + '20'; ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = col; ctx.font = 'bold 11px Outfit,sans-serif';
+    branch.split(' ').forEach((w, i, a) => ctx.fillText(w, bx, by + (i - (a.length-1)/2) * 13));
+    (data.sub[branch] || []).forEach((sub, si, sarr) => {
+      const sa = angle + (si - (sarr.length-1)/2) * 0.5;
+      const sx = bx + Math.cos(sa) * 88, sy = by + Math.sin(sa) * 78;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(sx, sy);
+      ctx.strokeStyle = col + '44'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx, sy, 24, 0, Math.PI * 2);
+      ctx.fillStyle = col + '10'; ctx.fill(); ctx.strokeStyle = col + '55'; ctx.stroke();
+      ctx.fillStyle = col + 'cc'; ctx.font = '10px Outfit,sans-serif';
+      sub.split(' ').forEach((w, i, a) => ctx.fillText(w, sx, sy + (i - (a.length-1)/2) * 11));
+    });
+  });
+}
+function clearMindMap() {
+  const c = document.getElementById('mindmapCanvas');
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+}
+
+// ===== CODE PLAYGROUND =====
+const CODE_TPL = {
+  Python: {
+    hello: `# Hello World\nprint("Hello, StudyMind!")\n\nname = "Arjun"\nage = 20\nprint(f"Name: {name}, Age: {age}")`,
+    loop: `# Loops in Python\nfor i in range(1, 6):\n    print(f"Step {i}")\n\nfruits = ["apple","banana","cherry"]\nfor f in fruits:\n    print(f)`,
+    function: `def add(a, b):\n    return a + b\n\ndef greet(name, msg="Hello"):\n    return f"{msg}, {name}!"\n\nprint(add(3, 4))\nprint(greet("Alice"))`,
+    class: `class Animal:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        return f"{self.name} makes a sound"\n\nclass Dog(Animal):\n    def speak(self):\n        return f"{self.name} says: Woof!"\n\ndog = Dog("Rex")\nprint(dog.speak())`,
+    sort: `arr = [64, 25, 12, 22, 11]\n\ndef bubble_sort(a):\n    n = len(a)\n    for i in range(n):\n        for j in range(n-i-1):\n            if a[j] > a[j+1]:\n                a[j], a[j+1] = a[j+1], a[j]\n    return a\n\nprint(bubble_sort(arr[:]))\nprint(sorted(arr))`,
+    recursion: `def factorial(n):\n    if n == 0: return 1\n    return n * factorial(n-1)\n\ndef fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)\n\nprint(factorial(5))\nprint([fib(i) for i in range(8)])`
+  },
+  JavaScript: {
+    hello: `console.log("Hello, StudyMind!");\nconst name = "Arjun";\nconsole.log(\`Name: \${name}\`);`,
+    loop: `for (let i = 1; i <= 5; i++) console.log(\`Step \${i}\`);\nconst fruits = ["apple","banana","cherry"];\nfruits.forEach(f => console.log(f));\nconst doubled = [1,2,3,4,5].map(n => n*2);\nconsole.log(doubled);`,
+    function: `const add = (a, b) => a + b;\nfunction greet(name, msg="Hello") { return \`\${msg}, \${name}!\`; }\nconsole.log(add(3,4));\nconsole.log(greet("Alice"));`,
+    class: `class Animal {\n  constructor(name) { this.name = name; }\n  speak() { return \`\${this.name} makes a sound\`; }\n}\nclass Dog extends Animal {\n  speak() { return \`\${this.name} says: Woof!\`; }\n}\nconst dog = new Dog("Rex");\nconsole.log(dog.speak());`,
+    sort: `const arr = [64,25,12,22,11];\nconsole.log([...arr].sort((a,b)=>a-b));\nfunction bubbleSort(a){\n  a=[...a];\n  for(let i=0;i<a.length;i++)\n    for(let j=0;j<a.length-i-1;j++)\n      if(a[j]>a[j+1])[a[j],a[j+1]]=[a[j+1],a[j]];\n  return a;\n}\nconsole.log(bubbleSort(arr));`,
+    recursion: `function factorial(n){ return n<=1?1:n*factorial(n-1); }\nfunction fib(n){ return n<=1?n:fib(n-1)+fib(n-2); }\nconsole.log(factorial(5));\nconsole.log(Array.from({length:8},(_,i)=>fib(i)));`
+  },
+  Java: {
+    hello: `// Java - output simulated\n// public class Main {\n//   public static void main(String[] args) {\n//     System.out.println("Hello, StudyMind!");\n//   }\n// }`,
+    loop: `// for(int i=1;i<=5;i++) System.out.println(i);\n// String[] arr = {"a","b","c"};\n// for(String s : arr) System.out.println(s);`,
+    function: `static int add(int a, int b) { return a+b; }\nstatic String greet(String n) { return "Hello, "+n+"!"; }`,
+    class: `class Animal {\n  String name;\n  Animal(String n) { name=n; }\n  String speak() { return name+" makes a sound"; }\n}\nclass Dog extends Animal {\n  Dog(String n) { super(n); }\n  @Override String speak() { return name+" says: Woof!"; }\n}`,
+    sort: `// Arrays.sort(arr); // O(n log n)\n// Manual bubble sort:\nvoid bubbleSort(int[] a){\n  for(int i=0;i<a.length;i++)\n    for(int j=0;j<a.length-i-1;j++)\n      if(a[j]>a[j+1]){int t=a[j];a[j]=a[j+1];a[j+1]=t;}\n}`,
+    recursion: `static int factorial(int n){\n  return n==0?1:n*factorial(n-1);\n}\nstatic int fib(int n){\n  return n<=1?n:fib(n-1)+fib(n-2);\n}`
+  },
+  'C++': {
+    hello: `#include <iostream>\nusing namespace std;\nint main(){\n  cout<<"Hello, StudyMind!"<<endl;\n  string name="Arjun";\n  cout<<"Name: "<<name<<endl;\n  return 0;\n}`,
+    loop: `#include <iostream>\n#include <vector>\nusing namespace std;\nint main(){\n  for(int i=1;i<=5;i++) cout<<i<<" ";\n  vector<string> v={"apple","banana","cherry"};\n  for(auto& s:v) cout<<s<<" ";\n  return 0;\n}`,
+    function: `int add(int a, int b){ return a+b; }\nstring greet(string n, string msg="Hello"){\n  return msg+", "+n+"!";\n}`,
+    class: `class Animal{\npublic:\n  string name;\n  Animal(string n):name(n){}\n  virtual string speak(){ return name+" makes a sound"; }\n};\nclass Dog: public Animal{\npublic:\n  Dog(string n):Animal(n){}\n  string speak() override{ return name+" says: Woof!"; }\n};`,
+    sort: `#include <algorithm>\n#include <vector>\nvector<int> v={64,25,12,22,11};\nsort(v.begin(),v.end()); // O(n log n)`,
+    recursion: `int factorial(int n){ return n==0?1:n*factorial(n-1); }\nint fib(int n){ return n<=1?n:fib(n-1)+fib(n-2); }`
+  }
+};
+const SYNTAX = {
+  Python: "def func():  |  class C:  |  [x for x in lst]  |  f'{val}'  |  list/dict/tuple/set  |  import mod  |  lambda x: x*2  |  with open() as f:  |  try/except",
+  JavaScript: "const/let/var  |  ()=>{}  |  \`\${x}\`  |  class C{}  |  async/await  |  .map/.filter/.reduce  |  import/export  |  try/catch  |  Promise",
+  Java: "int/String/boolean  |  System.out.println()  |  ArrayList<T>  |  HashMap<K,V>  |  @Override  |  interface I{}  |  try/catch  |  synchronized",
+  'C++': "int/string/bool  |  cout<<  |  vector<int>  |  map<K,V>  |  #include<>  |  namespace  |  template<typename T>  |  unique_ptr<T>  |  virtual"
+};
+function loadCodeTemplate(){
+  const lang = document.getElementById('codeLang').value;
+  document.getElementById('codeEditor').value = CODE_TPL[lang]?.hello || '// Start coding...';
+  document.getElementById('syntaxRef').textContent = SYNTAX[lang] || '';
+  document.getElementById('codeOutput').textContent = '// Click ▶ Run to execute';
+}
+function applyCodeTemplate(){
+  const lang = document.getElementById('codeLang').value;
+  const tpl = document.getElementById('codeTemplate').value;
+  if (tpl && CODE_TPL[lang]?.[tpl]) document.getElementById('codeEditor').value = CODE_TPL[lang][tpl];
+}
+function runCode(){
+  const lang = document.getElementById('codeLang').value;
+  const code = document.getElementById('codeEditor').value;
+  const out = document.getElementById('codeOutput');
+  if (lang === 'JavaScript') {
+    const logs = []; const orig = console.log;
+    console.log = (...a) => { logs.push(a.join(' ')); orig(...a); };
+    try { eval(code); console.log = orig; out.textContent = logs.join('\n') || '// No output'; out.style.color = '#00ff41'; }
+    catch(e) { console.log = orig; out.textContent = '❌ Error: ' + e.message; out.style.color = '#ff2d78'; }
+  } else {
+    out.style.color = '#00e5ff';
+    out.textContent = `📝 ${lang} simulation:\n// This is a code display tool.\n// JS runs live; other languages show code reference.\n\n${code.split('\n').slice(0,8).join('\n')}${code.split('\n').length>8?'\n// ...'+code.split('\n').length+' lines total':''}`;
+  }
+}
+function clearCode(){ document.getElementById('codeEditor').value=''; document.getElementById('codeOutput').textContent='// Output here...'; }
+
+// ===== NOTES =====
+if (!state.notes) state.notes = [];
+window._editNoteId = null;
+function saveNote(){
+  const title = document.getElementById('noteTitle').value.trim();
+  const text = document.getElementById('noteEditor').value.trim();
+  const subj = document.getElementById('noteSubj').value;
+  if(!title||!text){ showToast('⚠️','Fill title and content!'); return; }
+  const ei = state.notes.findIndex(n=>n.id===window._editNoteId);
+  if(ei>=0){ state.notes[ei]={...state.notes[ei],title,text,subj,updated:new Date().toLocaleDateString()}; window._editNoteId=null; }
+  else state.notes.push({id:Date.now(),title,text,subj,created:new Date().toLocaleDateString()});
+  document.getElementById('noteTitle').value=''; document.getElementById('noteEditor').value='';
+  renderNotes(); addXP(5,'saved a note'); save();
+  showToast('💾','Note saved!');
+}
+function newNote(){ document.getElementById('noteTitle').value=''; document.getElementById('noteEditor').value=''; window._editNoteId=null; }
+function renderNotes(){
+  document.getElementById('noteCount').textContent = (state.notes||[]).length;
+  const nl = document.getElementById('noteList'); if(!nl) return;
+  if(!(state.notes||[]).length){ nl.innerHTML='<div style="color:var(--muted);font-size:12px;padding:16px;grid-column:1/-1">No notes yet!</div>'; return; }
+  nl.innerHTML = state.notes.map(n=>`
+    <div class="note-card" onclick="openNote(${n.id})">
+      <div style="display:flex;justify-content:space-between;">
+        <div style="font-size:12px;font-weight:700">${n.title}</div>
+        <button onclick="event.stopPropagation();deleteNote(${n.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px">✕</button>
+      </div>
+      <div style="font-size:9px;color:var(--muted);margin:3px 0">${n.subj} · ${n.created}</div>
+      <div style="font-size:11px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${n.text}</div>
+    </div>`).join('');
+}
+function openNote(id){
+  const n=(state.notes||[]).find(n=>n.id===id); if(!n) return;
+  document.getElementById('noteTitle').value=n.title;
+  document.getElementById('noteEditor').value=n.text;
+  document.getElementById('noteSubj').value=n.subj;
+  window._editNoteId=id;
+}
+function deleteNote(id){ state.notes=(state.notes||[]).filter(n=>n.id!==id); renderNotes(); save(); }
+
+// ===== VOCABULARY =====
+const VOCAB = {
+  'All CS Terms': [
+    {t:'Algorithm',d:'Step-by-step procedure to solve a problem.',e:'Binary Search: O(log n) search algorithm'},
+    {t:'API',d:'Application Programming Interface — rules for software interaction.',e:'REST API, GraphQL'},
+    {t:'Recursion',d:'Function that calls itself with a simpler case.',e:'factorial(n) = n × factorial(n-1)'},
+    {t:'Cache',d:'Fast storage for copies of frequently-accessed data.',e:'Browser cache, CPU L1/L2 cache'},
+    {t:'Deadlock',d:'Two processes waiting for each other indefinitely.',e:'P1 holds lock A, waits for B; P2 holds B, waits for A'},
+    {t:'Polymorphism',d:'Same interface, different implementations.',e:'Dog.speak() and Cat.speak() behave differently'},
+    {t:'Abstraction',d:'Hiding complexity, showing only what is necessary.',e:'Using a car without knowing engine internals'},
+    {t:'Encapsulation',d:'Bundling data and methods, restricting direct access.',e:'Private fields with public getters/setters'},
+    {t:'Inheritance',d:'A class derives properties/behavior from another.',e:'Dog extends Animal'},
+    {t:'Mutex',d:'Mutual Exclusion lock for thread synchronization.',e:'Only one thread can hold the lock at a time'},
+  ],
+  'Data Structures': [
+    {t:'Stack',d:'LIFO structure — last in, first out.',e:'Browser back button, undo/redo, call stack'},
+    {t:'Queue',d:'FIFO structure — first in, first out.',e:'Print queue, BFS traversal'},
+    {t:'Heap',d:'Complete binary tree with heap property.',e:'Priority Queue implementation'},
+    {t:'Trie',d:'Tree for string keys, shared prefix nodes.',e:'Autocomplete, spell checker'},
+    {t:'Graph',d:'Vertices connected by edges.',e:'Social networks, maps, dependencies'},
+    {t:'Hash Map',d:'Key-value store with O(1) average access.',e:'Python dict, Java HashMap'},
+    {t:'BST',d:'Binary tree: left < root < right.',e:'O(log n) search when balanced'},
+    {t:'Deque',d:'Double-ended queue: O(1) at both ends.',e:'Sliding window algorithm'},
+  ],
+  Algorithms: [
+    {t:'BFS',d:'Breadth-First Search — explore level by level using Queue.',e:'Shortest path in unweighted graph'},
+    {t:'DFS',d:'Depth-First Search — explore deep first using Stack.',e:'Cycle detection, topological sort'},
+    {t:'Memoization',d:'Cache function results to avoid recomputation.',e:'Top-down dynamic programming'},
+    {t:"Dijkstra's",d:'Shortest path in weighted graph (positive weights).',e:'GPS navigation, network routing'},
+    {t:'Greedy',d:'Local optimal choice at each step.',e:'Huffman coding, Activity Selection'},
+    {t:'Backtracking',d:'Explore paths, undo when constraint violated.',e:'N-Queens, Sudoku solver'},
+    {t:'Divide & Conquer',d:'Split → solve recursively → combine.',e:'Merge Sort, Binary Search'},
+    {t:'Big O',d:'Worst-case complexity as input size grows.',e:'O(1), O(log n), O(n), O(n log n), O(n²)'},
+  ],
+  Networking: [
+    {t:'TCP',d:'Reliable, ordered, connection-based protocol.',e:'HTTP, HTTPS, FTP'},
+    {t:'UDP',d:'Fast, unreliable, connectionless protocol.',e:'Video streaming, gaming, DNS'},
+    {t:'DNS',d:'Domain Name System — translates names to IPs.',e:'google.com → 142.250.195.78'},
+    {t:'HTTP',d:'HyperText Transfer Protocol — web communication.',e:'GET /index.html HTTP/1.1'},
+    {t:'TLS/SSL',d:'Encrypted, authenticated communication.',e:'The S in HTTPS'},
+    {t:'Subnet',d:'Logical subdivision of a network.',e:'192.168.1.0/24'},
+    {t:'Firewall',d:'Controls incoming/outgoing network traffic.',e:'iptables, Windows Defender Firewall'},
+    {t:'Latency',d:'Time delay for data to travel source to destination.',e:'Ping 20ms = low latency game'},
+  ],
+  OS: [
+    {t:'Process',d:'Program in execution with own memory space.',e:'Chrome.exe'},
+    {t:'Thread',d:'Lightweight unit within a process sharing memory.',e:'Server handling each request in a thread'},
+    {t:'Semaphore',d:'Integer synchronization primitive.',e:'sem_wait(), sem_post()'},
+    {t:'Context Switch',d:'Save/load process state when switching CPU.',e:'OS multitasking between apps'},
+    {t:'Virtual Memory',d:'Disk used as extended RAM via paging.',e:'Swap space on Linux'},
+    {t:'Paging',d:'Fixed-size memory blocks managed by OS.',e:'4KB pages mapped via page table'},
+    {t:'Scheduler',d:'Decides which process runs next.',e:'Round Robin, CFS in Linux'},
+    {t:'System Call',d:'User program requests kernel service.',e:'read(), write(), fork(), exec()'},
+  ],
+  Database: [
+    {t:'ACID',d:'Atomicity, Consistency, Isolation, Durability.',e:'Bank transfer: all-or-nothing'},
+    {t:'Index',d:'Data structure to speed up queries.',e:'B-Tree index on Users.email'},
+    {t:'Foreign Key',d:'References primary key of another table.',e:'orders.user_id → users.id'},
+    {t:'Normalization',d:'Reduce redundancy: 1NF→2NF→3NF.',e:'Split tables to remove repeated data'},
+    {t:'Transaction',d:'Atomic unit — COMMIT or ROLLBACK.',e:'BEGIN; UPDATE; COMMIT;'},
+    {t:'JOIN',d:'Combine rows from tables on condition.',e:'INNER JOIN: only matching rows'},
+    {t:'Sharding',d:'Horizontal partitioning across servers.',e:'Users A-M on DB1, N-Z on DB2'},
+    {t:'CAP Theorem',d:'Consistency, Availability, Partition Tolerance — pick 2.',e:'MongoDB: CP, Cassandra: AP'},
+  ],
+};
+function loadVocab(){
+  const s = document.getElementById('vocabSubj').value;
+  const list = VOCAB[s] || VOCAB['All CS Terms'];
+  renderVocabGrid(list);
+  const wotd = VOCAB['All CS Terms'][new Date().getDate() % VOCAB['All CS Terms'].length];
+  document.getElementById('wotdContent').innerHTML = `<div style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:5px">${wotd.t}</div><div style="font-size:13px;margin-bottom:5px">${wotd.d}</div><div style="font-size:11px;color:var(--muted);font-style:italic">${wotd.e}</div>`;
+}
+function filterVocab(){
+  const q = document.getElementById('vocabSearch').value.toLowerCase();
+  const s = document.getElementById('vocabSubj').value;
+  const base = VOCAB[s] || VOCAB['All CS Terms'];
+  renderVocabGrid(base.filter(v => v.t.toLowerCase().includes(q) || v.d.toLowerCase().includes(q)));
+}
+function renderVocabGrid(list){
+  document.getElementById('vocabGrid').innerHTML = list.map(v => `
+    <div class="vocab-card">
+      <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px">${v.t}</div>
+      <div style="font-size:12px;line-height:1.6;margin-bottom:5px">${v.d}</div>
+      <div style="font-size:11px;color:var(--muted);font-style:italic">${v.e}</div>
+    </div>`).join('');
+}
+
+// ===== HEATMAP =====
+if (!state.heatmap) state.heatmap = {};
+function recordHeatmap(){
+  const k = new Date().toISOString().split('T')[0];
+  state.heatmap[k] = (state.heatmap[k] || 0) + 1;
+  save();
+}
+function renderHeatmap(){
+  const grid = document.getElementById('heatmapGrid'); if(!grid) return;
+  const now = new Date(); const cells = [];
+  for(let i=89;i>=0;i--){
+    const d=new Date(now.getTime()-i*86400000);
+    const k=d.toISOString().split('T')[0];
+    cells.push({k,v:state.heatmap[k]||0,date:d.toDateString()});
+  }
+  grid.innerHTML = cells.map(c=>{
+    const lvl=c.v===0?'':c.v===1?'l1':c.v<=3?'l2':c.v<=5?'l3':'l4';
+    return `<div style="width:12px;height:12px;border-radius:2px;background:${c.v===0?'var(--surface2)':''};${lvl==='l1'?'background:rgba(110,231,183,.2)':lvl==='l2'?'background:rgba(110,231,183,.5)':lvl==='l3'?'background:rgba(110,231,183,.8)':lvl==='l4'?'background:var(--accent)':''}" title="${c.date}: ${c.v} sessions" onmouseover="this.style.transform='scale(1.4)'" onmouseout="this.style.transform='scale(1)'"></div>`;
+  }).join('');
+  const active = cells.filter(c=>c.v>0).length;
+  document.getElementById('hmTotal').textContent = active;
+  let cur=0,best=0;
+  for(let i=cells.length-1;i>=0;i--){if(cells[i].v>0)cur++;else break;}
+  for(let i=0,streak=0;i<cells.length;i++){if(cells[i].v>0){streak++;best=Math.max(best,streak);}else streak=0;}
+  document.getElementById('hmStreak').textContent = cur;
+  document.getElementById('hmBest').textContent = best;
+}
+
+// ===== WEAKNESS ANALYZER =====
+function renderWeakness(){
+  const counts={};
+  (state.mistakes||[]).forEach(m=>{counts[m.subj]=(counts[m.subj]||0)+1;});
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?sorted[0][1]:1;
+  document.getElementById('weaknessChart').innerHTML = sorted.length ? sorted.map(([s,c])=>`
+    <div class="wk-bar">
+      <div style="font-size:12px;width:120px;flex-shrink:0">${s}</div>
+      <div class="wk-track"><div class="wk-fill" style="width:${Math.round(c/max*100)}%"></div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);width:28px;text-align:right">${c}</div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:12px;text-align:center;padding:24px">Take quizzes to see your analysis!</div>';
+  document.getElementById('weaknessRec').innerHTML = sorted.slice(0,3).map(([s,c],i)=>`
+    <div style="padding:10px 14px;background:var(--surface2);border-left:3px solid ${['var(--accent3)','var(--yellow)','var(--accent4)'][i]};border-radius:0 8px 8px 0;">
+      <div style="font-size:12px;font-weight:700">${['⚠️ Priority','📌 Focus','💡 Review'][i]}: ${s}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${c} mistake${c>1?'s':''} — Do ${s} flashcards and retry quiz</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px">No data yet.</div>';
+}
+
+// ===== INTERVIEW PREP =====
+const IQ = {
+  Python:[
+    {q:"What is Python's GIL?",t:"Python",a:"Global Interpreter Lock — allows only one thread to execute Python bytecode at a time. Prevents true parallelism on multi-core. Use multiprocessing for CPU-bound, asyncio for I/O-bound tasks."},
+    {q:"Generators vs Iterators?",t:"Python",a:"Iterator: implements __iter__ and __next__. Generator: function with yield — creates lazy iterator. Memory-efficient for large datasets since values are produced one at a time."},
+    {q:"What is a decorator?",t:"Python",a:"A function that wraps another function to add behavior. @functools.wraps preserves metadata. Used for: logging, authentication, caching (@lru_cache), timing."},
+  ],
+  Java:[
+    {q:"Java memory model — Stack vs Heap?",t:"Java",a:"Stack: local variables, method calls (per thread, LIFO). Heap: objects, shared across threads. GC manages heap. PermGen/Metaspace: class metadata."},
+    {q:"Comparable vs Comparator?",t:"Java",a:"Comparable: natural ordering in the class (compareTo). Comparator: external ordering (compare). Comparator is more flexible — multiple orderings, works when you can't modify the class."},
+    {q:"What are Java Streams?",t:"Java",a:"Functional pipeline operations: filter, map, reduce. Lazy — operations only run at terminal. list.stream().filter(x->x>5).map(x->x*2).collect(toList()). Parallel streams for performance."},
+  ],
+  'Data Structures':[
+    {q:"When use Hash Table over BST?",t:"DS",a:"Hash Table: O(1) avg, no ordering needed. BST: O(log n) but maintains sorted order, supports range queries. Use HT for pure lookups; BST for ordered traversal or range queries."},
+    {q:"How to implement LRU Cache?",t:"DS",a:"HashMap + Doubly Linked List. Map gives O(1) key lookup. List maintains recency order — recently used at front. On get: move to front O(1). On put: add front, if over capacity remove tail O(1)."},
+    {q:"BFS vs DFS — when to use?",t:"DS",a:"BFS: Queue, level-by-level, finds shortest path in unweighted graph. O(V+E), O(width) space. DFS: Stack/recursion, O(V+E), O(depth) space. Good for: cycle detection, topological sort, path existence."},
+  ],
+  'System Design':[
+    {q:"How to design URL shortener?",t:"Design",a:"Generate short ID (base62, 6-8 chars). Store {shortID: longURL} in DB. Redis cache hot URLs. 301 redirect (permanent, cacheable) vs 302 (tracked). Scale: partition by shortID, add CDN."},
+    {q:"How does CDN work?",t:"Design",a:"Distributed edge servers near users. Static assets cached at PoPs. DNS routes to nearest edge. Cache hit: served fast. Cache miss: fetch from origin, cache for next time. Benefits: low latency, origin offload, DDoS protection."},
+    {q:"Explain CAP Theorem",t:"Design",a:"Distributed system can only guarantee 2 of: Consistency (all nodes same data), Availability (always responds), Partition Tolerance (works despite network splits). MongoDB=CP, Cassandra=AP, RDBMS=CA."},
+  ],
+  Behavioral:[
+    {q:"Describe a difficult bug you fixed",t:"Behavioral",a:"Use STAR: Situation (context), Task (your role), Action (systematic debugging: reproduce, isolate, logs, divide-and-conquer), Result (fixed + prevented recurrence). Emphasize methodical approach and what you learned."},
+    {q:"How do you handle conflicting priorities?",t:"Behavioral",a:"Clarify urgency + impact. Communicate early with stakeholders. Break into smallest valuable units. Be transparent about trade-offs. Show you're proactive, make reasoned decisions, communicate clearly."},
+    {q:"Tell me about a project you're proud of",t:"Behavioral",a:"Structure: problem solved (impact) → your role → technical challenges → results/metrics → what you learned. Quantify results. Show ownership, technical depth, and real impact."},
+  ],
+  Algorithms:[
+    {q:"Two Sum — optimal solution",t:"Algorithm",a:"O(n) with HashMap: for each num, check if (target-num) in map. If yes return indices, else add num to map. Single pass, O(n) space. Brute force O(n²) checks all pairs."},
+    {q:"Detect cycle in linked list",t:"Algorithm",a:"Floyd's: slow (1 step) + fast (2 steps). If they meet, cycle exists O(n) O(1). To find cycle start: after meeting, move slow to head, advance both 1 step — meet at cycle start."},
+    {q:"Reverse a linked list",t:"Algorithm",a:"Iterative: prev=null, cur=head. While cur: next=cur.next, cur.next=prev, prev=cur, cur=next. Return prev. O(n) O(1). Recursive: reverse(rest), head.next.next=head, head.next=null."},
+  ],
+};
+function loadInterview(){
+  const cat = document.getElementById('interviewCat').value;
+  let qs = cat==='All' ? Object.values(IQ).flat() : (IQ[cat]||[]);
+  renderIQList(qs);
+}
+function shuffleInterview(){
+  const cat = document.getElementById('interviewCat').value;
+  let qs = cat==='All' ? Object.values(IQ).flat() : (IQ[cat]||[]);
+  renderIQList([...qs].sort(()=>Math.random()-.5));
+}
+const IQ_COLORS = {Python:'var(--accent)',Java:'var(--accent4)',DS:'var(--yellow)',Design:'var(--accent2)',Behavioral:'var(--green)',Algorithm:'var(--accent3)'};
+function renderIQList(qs){
+  document.getElementById('interviewList').innerHTML = qs.map((q,i)=>`
+    <div class="iq-card" id="iq_${i}" onclick="this.classList.toggle('open');this.querySelector('.iq-ans').style.display=this.classList.contains('open')?'block':'none'">
+      <div style="display:inline-block;font-size:9px;padding:2px 8px;border-radius:8px;background:${IQ_COLORS[q.t]||'var(--accent)'}22;color:${IQ_COLORS[q.t]||'var(--accent)'};margin-bottom:6px;font-weight:700">${q.t}</div>
+      <div style="font-size:13px;font-weight:600">${q.q}</div>
+      <div class="iq-ans" style="display:none;font-size:12px;color:var(--muted);line-height:1.65;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${q.a}</div>
+    </div>`).join('');
+}
+
+// ===== COIN SHOP =====
+if (!state.ownedItems) state.ownedItems = [];
+if (!state.coins) state.coins = 0;
+const SHOP = [
+  {id:'theme_neon',n:'Neon Theme',i:'💚',p:50,d:'Pure neon glow aesthetic',t:'theme',v:'theme-neon'},
+  {id:'theme_pastel',n:'Pastel Theme',i:'🌸',p:50,d:'Soft pink and purple pastels',t:'theme',v:'theme-pastel'},
+  {id:'badge_elite',n:'Elite Badge',i:'🥇',p:80,d:'Elite coder status badge',t:'badge'},
+  {id:'badge_grind',n:'Grindset Badge',i:'💀',p:100,d:'No days off. Pure grind.',t:'badge'},
+  {id:'bonus_fc',n:'Flashcard Pack',i:'🃏',p:30,d:'Bonus advanced flashcard set',t:'info'},
+  {id:'theme_ocean',n:'Ocean Theme',i:'🌊',p:50,d:'Deep blue ocean colors',t:'theme',v:'theme-ocean'},
+];
+function renderShop(){
+  const el = document.getElementById('shopCoins'); if(el) el.textContent = state.coins;
+  document.getElementById('shopGrid').innerHTML = SHOP.map(item=>{
+    const owned = (state.ownedItems||[]).includes(item.id);
+    return `<div class="shop-item ${owned?'owned':''}">
+      <div style="font-size:36px;margin-bottom:8px">${item.i}</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">${item.n}</div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--yellow);margin:4px 0">${owned?'✅ Owned':'🪙 '+item.p}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${item.d}</div>
+      ${owned?`<button class="btn btn-outline" style="font-size:11px;padding:6px 12px;width:100%" onclick="useShopItem('${item.id}')">Use</button>`:`<button class="btn btn-yellow" style="font-size:11px;padding:6px 12px;width:100%" onclick="buyShopItem('${item.id}')">Buy</button>`}
+    </div>`;
+  }).join('');
+}
+function buyShopItem(id){
+  const item = SHOP.find(i=>i.id===id); if(!item) return;
+  if((state.ownedItems||[]).includes(id)){ showToast('ℹ️','Already owned!'); return; }
+  if((state.coins||0) < item.p){ showToast('⚠️',`Need ${item.p} coins! You have ${state.coins||0}.`); return; }
+  state.coins -= item.p;
+  if(!state.ownedItems) state.ownedItems=[];
+  state.ownedItems.push(id);
+  renderShop(); showToast(item.i,'Bought: '+item.n+'!'); save();
+}
+function useShopItem(id){
+  const item = SHOP.find(i=>i.id===id); if(!item) return;
+  if(item.t==='theme' && item.v) applyTheme(item.v);
+  else showToast(item.i, item.n+' — Active!');
+}
+function applyTheme(t){
+  const themeCSS = {
+    'theme-neon':'body{--bg:#000;--surface:#001400;--surface2:#002800;--border:#004d00;--text:#00ff41;--accent:#00ff41;--muted:#004400;--muted2:#006600;}',
+    'theme-ocean':'body{--bg:#030712;--surface:#0c1524;--surface2:#111e33;--border:#1e3a5f;--text:#e0f2fe;--accent:#38bdf8;}',
+    'theme-pastel':'body{--bg:#faf5ff;--surface:#fff;--surface2:#f5f0ff;--border:#e2d9f3;--text:#1e1b4b;--accent:#8b5cf6;--muted:#a78bfa;--muted2:#7c3aed;}'
+  };
+  let styleEl = document.getElementById('dynTheme');
+  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='dynTheme'; document.head.appendChild(styleEl); }
+  styleEl.textContent = themeCSS[t]||'';
+  showToast('🎨','Theme applied!');
+}
+
+// Record activity on load
+recordHeatmap();
+// init new features display
+document.getElementById('coinsDisplay') && (document.getElementById('coinsDisplay').textContent = state.coins||0);
+
+
+window.onload = () => {
+  addXP(0); // init display
+  document.getElementById('streakCount').textContent = state.streak;
+  refreshDashboard();
+  loadFlashcards();
+  loadFormulas();
+  renderHabits();
+  renderPomoDots();
+  renderAchievements();
+};
+</script>
+</body>
+</html>
