@@ -107,11 +107,12 @@ void handleRequest(char *content, int socketd){
 
 void *handleConnection(void* arg){
 	int conn = *((int *) arg);
- 	printf("Socket accepted connection from client....\n");
+ 	printf("\nNew connection....\n");
         char recieveBuffer[2048];
         ssize_t bytesrecv = recv(conn, recieveBuffer, sizeof(recieveBuffer), 0);
         handleRequest(recieveBuffer, conn);
         close(conn);
+	return arg;
 }
 
 int main(){
