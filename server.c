@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -104,6 +105,15 @@ void handleRequest(char *content, int socketd){
 }
 
 
+void *handleConnection(void* arg){
+	int conn = *((int *) arg);
+ 	printf("Socket accepted connection from client....\n");
+        char recieveBuffer[2048];
+        ssize_t bytesrecv = recv(conn, recieveBuffer, sizeof(recieveBuffer), 0);
+        handleRequest(recieveBuffer, conn);
+        close(conn);
+}
+
 int main(){
 	printf("Server Started\n");
 	int socketd = socket(AF_INET, SOCK_STREAM, 0);
@@ -129,11 +139,9 @@ int main(){
         if(conn < 0){
                 printf("Error occured in accepting connection");
         }
-        printf("Socket accepted connection from client....\n");
-        char recieveBuffer[2048];
-        ssize_t bytesrecv = recv(conn, recieveBuffer, sizeof(recieveBuffer), 0);
-        handleRequest(recieveBuffer, conn);
-	close(conn);
+	pthread_t clientThread;
+	pthread_create(&clientThread, NULL, &handleConnection, &conn);
+        pthread_detach(clientThread);
 	}
 	return 0;
 }
