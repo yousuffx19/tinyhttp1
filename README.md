@@ -8,6 +8,7 @@ A very basic HTTP 1.1 Server written in C
 - Can serve large files completely
 - Custom routes displaying messages
 - Reliable response codes
+- Supports very small amount of MIME types but enough for general use
 - Logs incoming requests onto the terminal
 
 ## How to run
