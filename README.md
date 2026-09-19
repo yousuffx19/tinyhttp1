@@ -24,5 +24,8 @@ A very basic HTTP 1.1 Server written in C
 - C POSIX sockets
 - POSIX threads for handling mutltiple connections
 
-  
+## Limitations
+- Cannot handle very large amount of connections simultaneously
+- Only implements 'Connection: Close' and no keep-alive 
+- So no chuked transfer-encoding for very large files
 
