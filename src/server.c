@@ -75,7 +75,10 @@ void mapRequest(int socketd, char *method, char *path, char *version){
 	       	if(!strcmp(returnType, "index")){
 			strcat(path, "index.html");
 		}	
-		long fs = getFileSize(path+1);
+		char fullPath[516] = "/www\0";
+		strcat(fullPath, path);
+		printf("Full path: %s\n", fullPath);
+		long fs = getFileSize(fullPath+1);
 		if(fs <= 0){
 			generateResponse("404 Not Found", strlen("404 Not Found"), "text/plain", response);
                         sendResponse(socketd, response, sizeof(response));
@@ -83,7 +86,7 @@ void mapRequest(int socketd, char *method, char *path, char *version){
 		}
 		generateHeaders(fs, returnType, response);
 	       	send(socketd, response, strlen(response), 0);	
-		if(sendFile(socketd,path+1, fs) <= 0){
+		if(sendFile(socketd,fullPath+1, fs) <= 0){
 			       printf("Error in Sending File");
 			       return;
 		}
