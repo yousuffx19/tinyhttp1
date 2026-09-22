@@ -28,4 +28,4 @@ A very basic HTTP 1.1 Server written in C
 - Cannot handle very large amount of connections simultaneously
 - Only implements 'Connection: Close' and no keep-alive 
 - So no chunked transfer-encoding for very large files
-
+- Made with POSIX specific system calls, only works on Linux platforms
