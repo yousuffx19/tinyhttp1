@@ -14,7 +14,7 @@ A very basic HTTP 1.1 Server written in C
 ## How to run
 - clone the repository into your computer
 - run ``make`` and it generates the binary in bin/
-- ``cd bin`` and then ``./server`` to run the server
+- ``./bin/server`` to run the server
 - server runs at localhost:8080
 - Upload the files you want to serve inside the www folder
 - access them by appending their path after localhost:8080
@@ -27,5 +27,5 @@ A very basic HTTP 1.1 Server written in C
 ## Limitations
 - Cannot handle very large amount of connections simultaneously
 - Only implements 'Connection: Close' and no keep-alive 
-- So no chuked transfer-encoding for very large files
+- So no chunked transfer-encoding for very large files
 
