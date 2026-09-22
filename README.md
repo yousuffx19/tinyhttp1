@@ -16,7 +16,7 @@ A very basic HTTP 1.1 Server written in C
 - run ``make`` and it generates the binary in bin/
 - ``cd bin`` and then ``./server`` to run the server
 - server runs at localhost:8080
-- Upload the files you want to serve inside the bin folder
+- Upload the files you want to serve inside the www folder
 - access them by appending their path after localhost:8080
 
 ## Built With
