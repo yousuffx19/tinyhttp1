@@ -56,9 +56,6 @@ void mapRequest(int socketd, char *method, char *path, char *version){
 		generateResponse("405 Method Not Allowed", strlen("405 Method Not Allowed"), "text/plain", response);
 		send(socketd, response, sizeof(response), 0);
 	}
-	if(path[strlen(path)-1] == '/'){
-		path[strlen(path)-1] = '\0';
-	}
 	if(!strcmp(path, "/hello")){
 		generateResponse("Hi", strlen("Hi"), "text/plain", response);
 		send(socketd, response, sizeof(response),0);
@@ -76,7 +73,7 @@ void mapRequest(int socketd, char *method, char *path, char *version){
 			 return;
 		}
 	       	if(!strcmp(returnType, "index")){
-			strcat(path, "/index.html");
+			strcat(path, "index.html");
 		}	
 		char fullPath[516] = "/www\0";
 		strcat(fullPath, path);
