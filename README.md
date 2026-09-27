@@ -10,6 +10,7 @@ A very basic HTTP 1.1 Server written in C
 - Reliable response codes
 - Supports very small amount of MIME types but enough for general use
 - Logs incoming requests onto the terminal
+- Directory Listing
 
 ## How to run
 - clone the repository into your computer
