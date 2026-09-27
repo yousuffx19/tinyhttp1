@@ -38,7 +38,7 @@ void getReturnType(char* filename, char* buffer){
 			
 			
 void generateResponse(char *responseBody,size_t length, char *returnType, char *buffer){
-        char response[4096];
+        char response[8192];
         int len = snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\n"
     "Content-Type: %s\r\n"
     "Content-Length: %zu\r\n"

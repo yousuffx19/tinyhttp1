@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include "httputils.h"
-
+#include "dirutils.h"
 
 ssize_t sendResponse(int socketd, void* response, int responseSize){
 	ssize_t total = 0;
@@ -72,14 +72,29 @@ void mapRequest(int socketd, char *method, char *path, char *version){
                 	 send(socketd, response, sizeof(response), 0);
 			 return;
 		}
-	       	if(!strcmp(returnType, "index")){
-			strcat(path, "index.html");
-		}	
 		char fullPath[516] = "/www\0";
+		char originalPath[516];
 		strcat(fullPath, path);
+		strcpy(originalPath, fullPath);
+		int isFolder = 0;
+		if(!strcmp(returnType, "index"))
+		{
+			if(isDir(fullPath+1) && fullPath[strlen(fullPath)-1] == '/'){
+				isFolder=1;
+				strcpy(returnType, "text/html"); 
+			}
+			strcat(fullPath, "index.html");
+                }
 		printf("Full path: %s\n", fullPath);
 		long fs = getFileSize(fullPath+1);
 		if(fs <= 0){
+			if(isFolder == 1){
+				char folderBuffer[4096];
+				generateDirectoryHTML(originalPath+1, folderBuffer, path);
+				generateResponse(folderBuffer, strlen(folderBuffer), "text/html", response);
+                        	sendResponse(socketd, response, sizeof(response));
+				return;
+			}	
 			generateResponse("404 Not Found", strlen("404 Not Found"), "text/plain", response);
                         sendResponse(socketd, response, sizeof(response));
 			return;	
