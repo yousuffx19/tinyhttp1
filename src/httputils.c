@@ -31,6 +31,9 @@ void getReturnType(char* filename, char* buffer){
 	else if(!strcmp(extension, "png")){
 		strcpy(buffer, "image/png");
 	}
+	else if(!strcmp(extension, "txt")){
+                strcpy(buffer, "text/plain");
+        }
 	else{
 		strcpy(buffer, "invalid");
 	}
